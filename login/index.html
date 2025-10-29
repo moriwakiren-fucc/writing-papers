@@ -1,29 +1,21 @@
-<!-- login/index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ログイン</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
   <div class="login-container">
     <h2>メンバーログイン</h2>
     <input type="email" id="email" placeholder="メールアドレス" />
     <input type="password" id="password" placeholder="パスワード" />
-    <button id="loginBtn">ログイン</button>
-    <p id="message"></p>
+    <button id="login-btn">ログイン</button>
+    <p id="error-message"></p>
   </div>
 
-  <!-- Firebaseのライブラリ -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"></script>
-
-  <!-- あなたのFirebase設定 -->
-  <script src="firebase-config.js"></script>
-
   <!-- ログイン処理 -->
-  <script type="module" src="main.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
