@@ -10,16 +10,15 @@ const auth = getAuth(app);
 document.getElementById("login-btn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-
   const errorMessage = document.getElementById("error-message");
   errorMessage.textContent = "";
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log(userCredential); // 確認用
-    window.location.href = "../chat.html"; // 成功したらチャットへ
+    window.location.href = "../chat.html"; // 成功したらチャットページへ
   } catch (error) {
-    console.error(error); // 開発者コンソールにエラーを出力
+    console.error(error);
     errorMessage.textContent = "ログインに失敗しました。メールアドレスまたはパスワードを確認してください。";
   }
 });
