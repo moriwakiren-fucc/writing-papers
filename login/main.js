@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { firebaseConfig } from "./firebase-config.js";
 
-// Firebase 初期化
+// Firebase初期化
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -11,15 +11,15 @@ const passwordInput = document.getElementById("password");
 const loginBtn = document.getElementById("login-btn");
 const errorMessage = document.getElementById("error-message");
 
-// --- ブラウザに保存したログイン情報があれば自動入力 ---
+// ブラウザに保存したログイン情報があれば自動入力
 emailInput.value = localStorage.getItem("savedEmail") || "";
 passwordInput.value = localStorage.getItem("savedPassword") || "";
 
-// --- Enterキーでログイン ---
+// Enterキーでログイン
 emailInput.addEventListener("keyup", (e) => { if (e.key === "Enter") loginBtn.click(); });
 passwordInput.addEventListener("keyup", (e) => { if (e.key === "Enter") loginBtn.click(); });
 
-// --- ログインボタンクリック処理 ---
+// ログインボタン処理
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
@@ -33,20 +33,20 @@ loginBtn.addEventListener("click", async () => {
     localStorage.setItem("savedEmail", email);
     localStorage.setItem("savedPassword", password);
 
-    // チャットページへ
-    window.location.href = "../chat.html";
+    // 全体のトップページに遷移
+    window.location.href = "../index.html";
   } catch (error) {
     console.error(error);
     errorMessage.textContent = "ログインに失敗しました。メールアドレスまたはパスワードを確認してください。";
   }
 });
 
-// --- ログイン状態チェック ---
+// ログイン状態チェック
 onAuthStateChanged(auth, user => {
   if (user) {
-    // すでにログイン済みならチャットページへ
-    if (!window.location.href.includes("chat.html")) {
-      window.location.href = "../chat.html";
+    // すでにログイン済みなら全体トップページへ
+    if (!window.location.href.includes("index.html")) {
+      window.location.href = "../index.html";
     }
   }
 });
