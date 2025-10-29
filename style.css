@@ -10,19 +10,23 @@
 .banner {
   background-color: #FFFF00;
   text-align: center;
-  padding: 8px 0;
+  padding: 12px 0; /* 以前の1.5倍 */
   font-weight: bold;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1001;
 }
 
 /* ヘッダー */
 header {
   position: fixed;
-  top: 28px; /* バナーの下 */
+  top: calc(12px*2); /* バナーの下 */
   left: 0;
   width: 100%;
-  height: 60px;
-  background-color: #5563DE;
-  color: white;
+  height: 90px; /* 以前の1.5倍（60px → 90px） */
+  background-color: white;
+  border-bottom: 2px solid #444444;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -30,30 +34,29 @@ header {
 }
 
 header .menu-btn {
-  font-size: 24px;
+  font-size: 36px; /* 1.5倍に調整 */
   background: none;
   border: none;
-  color: white;
   cursor: pointer;
   margin-right: 10px;
 }
 
 header .header-icon {
-  width: 32px;
-  height: 32px;
+  width: 48px; /* 1.5倍 */
+  height: 48px;
   margin-right: 10px;
 }
 
 header .header-title {
-  font-size: 20px;
+  font-size: 30px; /* 以前の1.5倍 */
   font-weight: bold;
 }
 
 /* サイドメニュー */
 .side-menu {
   position: fixed;
-  top: 88px; /* ヘッダーの下 */
-  left: -250px; /* 初期は隠す */
+  top: calc(12px*2 + 90px); /* バナー＋ヘッダーの下 */
+  left: -250px;
   width: 250px;
   height: 100%;
   background-color: #333;
@@ -90,7 +93,7 @@ header .header-title {
 
 /* メイン */
 main {
-  margin-top: 88px; /* ヘッダーの下 */
+  margin-top: calc(12px*2 + 90px); /* バナー＋ヘッダー分 */
   padding: 20px;
 }
 
@@ -104,6 +107,7 @@ main h1 {
 
 /* お知らせセクション */
 .announcements h2 {
+  font-size: calc(3em / 3 * 2); /* h1の3分の2 */
   margin-bottom: 12px;
 }
 
@@ -111,9 +115,10 @@ main h1 {
   margin-bottom: 12px;
 }
 
-.announcement h4 {
+.announcement h3 { /* h4 → h3 */
   cursor: pointer;
   user-select: none;
+  font-size: calc((3em / 3 * 2) * 2 / 3); /* pのh2の2分の3 */
 }
 
 .announcement .content {
@@ -126,3 +131,26 @@ main h1 {
   border-top: 1px dotted #999;
 }
 
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  header .header-title {
+    font-size: 24px;
+  }
+
+  header .header-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  main h1 {
+    font-size: 2em;
+  }
+
+  .announcements h2 {
+    font-size: 1.5em;
+  }
+
+  .announcement h3 {
+    font-size: 1.1em;
+  }
+}
