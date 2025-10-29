@@ -14,6 +14,7 @@
   font-weight: bold;
   position: fixed;
   top: 0;
+  height: 5vh;
   width: 100%;
   z-index: 1001;
 }
@@ -21,10 +22,10 @@
 /* ヘッダー */
 header {
   position: fixed;
-  top: 8.4px; /* バナー下 */
+  top: 5vh; /* バナー下 */
   left: 0;
   width: 100%;
-  height: 63px; /* 以前の90pxの0.7倍 */
+  height: 7vh; /* 以前の90pxの0.7倍 */
   background-color: white;
   border-bottom: 2px solid #444444;
   display: flex;
