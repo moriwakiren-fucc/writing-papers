@@ -21,7 +21,7 @@
 /* ヘッダー */
 header {
   position: fixed;
-  top: calc(8.4px * 2); /* バナー下 */
+  top: 8.4px * 2; /* バナー下 */
   left: 0;
   width: 100%;
   height: 40px; /* 以前の90pxの0.7倍 */
