@@ -24,7 +24,7 @@ header {
   top: 8.4px * 2; /* バナー下 */
   left: 0;
   width: 100%;
-  height: 63px; /* 以前の90pxの0.7倍 */
+  height: 35px; /* 以前の90pxの0.7倍 */
   background-color: white;
   border-bottom: 2px solid #444444;
   display: flex;
