@@ -8,6 +8,13 @@ body, html {
   flex-direction: column;
 }
 
+h2 a {
+  font-size: 1.5em;
+  text-decoration: none;
+  color: #000000;
+}
+
+
 header {
   background-color: white;
   padding: 10px 20px;
@@ -15,6 +22,7 @@ header {
   font-size: 1.5em;
   font-weight: bold;
   border-bottom: 1px solid #444444;
+  display: inline-block;
   flex-shrink: 0;
 }
 
