@@ -10,11 +10,10 @@
 .banner {
   background-color: #FFFF00;
   text-align: center;
-  padding: 8.4px 0; /* 以前の12pxの0.7倍 */
+  padding: 2.5vh 0; /* 以前の12pxの0.7倍 */
   font-weight: bold;
   position: fixed;
   top: 0;
-  height: 5vh;
   width: 100%;
   z-index: 1001;
 }
@@ -25,17 +24,16 @@ header {
   top: 5vh; /* バナー下 */
   left: 0;
   width: 100%;
-  height: 7vh; /* 以前の90pxの0.7倍 */
+  height: 12.5vh; /* 以前の90pxの0.7倍 */
   background-color: white;
   border-bottom: 2px solid #444444;
   display: flex;
   align-items: center; /* 上下中央揃え */
-  padding: 0 20px;
   z-index: 1000;
 }
 
 header .menu-btn {
-  font-size: 25.2px; /* 以前の36pxの0.7倍 */
+  font-size: 9vh; /* 以前の36pxの0.7倍 */
   background: none;
   border: none;
   cursor: pointer;
@@ -43,13 +41,13 @@ header .menu-btn {
 }
 
 header .header-icon {
-  width: 33.6px; /* 以前の48pxの0.7倍 */
-  height: 33.6px;
+  width: 10vh; /* 以前の48pxの0.7倍 */
+  height: 10vh;
   margin-right: 10px;
 }
 
 header .header-title {
-  font-size: 21px; /* 以前の30pxの0.7倍 */
+  font-size: 8.5vh; /* 以前の30pxの0.7倍 */
   font-weight: bold;
   display: flex;
   align-items: center; /* アイコンと文字を上下中央揃え */
@@ -58,7 +56,7 @@ header .header-title {
 /* サイドメニュー */
 .side-menu {
   position: fixed;
-  top: calc(8.4px*2 + 63px); /* バナー＋ヘッダー分 */
+  top: 17.5vh; /* バナー＋ヘッダー分 */
   left: -250px;
   width: 250px;
   height: 100%;
