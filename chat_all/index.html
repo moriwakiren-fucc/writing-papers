@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>チャット | 論文制作ページ</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDKは後で追加 -->
+</head>
+<body>
+  <header>
+    <h1>チャット</h1>
+  </header>
+
+  <main id="chat-container">
+    <!-- 各投稿はJSで生成 -->
+  </main>
+
+  <!-- 送信帯 -->
+  <div class="chat-input-area">
+    <button id="file-btn">📂</button>
+    <textarea id="chat-input" placeholder="メッセージを入力..." rows="2"></textarea>
+    <button id="send-btn">
+      <img src="../imgs/chat/send.png" alt="送信">
+    </button>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
 
