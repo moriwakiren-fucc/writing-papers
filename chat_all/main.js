@@ -1,4 +1,10 @@
-// メンバー情報リスト
+import { db, auth } from "../login/firebase-config.js";
+import { ref, push, onChildAdded, update, get, child } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+// ユーザー情報（ログインユーザー）
+const currentUser = { email: "me@example.com", name: "私" };
+
+// メンバーリスト
 const members = [
   { email: "me@example.com", name: "私" },
   { email: "user1@example.com", name: "山田" },
@@ -10,15 +16,54 @@ const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
 const fileBtn = document.getElementById("file-btn");
 
-// 投稿を生成する関数
+// メッセージ送信
+function sendMessage(text) {
+  const now = new Date();
+  const hh = now.getHours().toString().padStart(2, "0");
+  const mm = now.getMinutes().toString().padStart(2, "0");
+
+  const messageRef = ref(db, "chat_messages");
+  push(messageRef, {
+    senderEmail: currentUser.email,
+    text,
+    timestamp: `${hh}:${mm}`,
+    readBy: [currentUser.email]
+  });
+}
+
+// 受信・表示
+const messagesRef = ref(db, "chat_messages");
+onChildAdded(messagesRef, (snapshot) => {
+  const data = snapshot.val();
+  const key = snapshot.key;
+
+  // 誰が既読か判定
+  const readCount = data.readBy ? data.readBy.length : 0;
+
+  addMessage({
+    id: key,
+    sender: members.find(m => m.email === data.senderEmail)?.name || data.senderEmail,
+    text: data.text,
+    readCount,
+    readers: data.readBy || [],
+    time: data.timestamp,
+    read: !data.readBy.includes(currentUser.email)
+  });
+
+  // ローカルで自分の既読に追加
+  if (!data.readBy.includes(currentUser.email)) {
+    const updateRef = ref(db, `chat_messages/${key}/readBy`);
+    update(updateRef, [...(data.readBy || []), currentUser.email]);
+  }
+});
+
+// DOMにメッセージ追加
 function addMessage(message) {
   const bubble = document.createElement("div");
-  bubble.classList.add("chat-bubble");
+  bubble.classList.add("chat-bubble", message.sender === "私" ? "right" : "left");
+  if (message.read) bubble.classList.add("unread");
 
-  bubble.classList.add(message.sender === "私" ? "right" : "left");
-  if (!message.read) bubble.classList.add("unread");
-
-  // 送信者名（他者のみ）
+  // 他者の送信者名
   if (message.sender !== "私") {
     const senderEl = document.createElement("div");
     senderEl.classList.add("sender");
@@ -26,7 +71,6 @@ function addMessage(message) {
     bubble.appendChild(senderEl);
   }
 
-  // メッセージ本文（URLをリンク化）
   const textEl = document.createElement("div");
   textEl.innerHTML = message.text.replace(
     /(https?:\/\/[^\s]+)/g,
@@ -34,7 +78,6 @@ function addMessage(message) {
   );
   bubble.appendChild(textEl);
 
-  // 既読数とタイムスタンプ
   const readEl = document.createElement("div");
   readEl.classList.add("read-status");
   readEl.textContent = `既読：${message.readCount}`;
@@ -46,7 +89,6 @@ function addMessage(message) {
   bubble.appendChild(readEl);
   bubble.appendChild(timeEl);
 
-  // ダブルクリックで既読者リスト表示
   bubble.addEventListener("dblclick", () => {
     alert(`既読順：${message.readers.join(", ")}`);
   });
@@ -59,20 +101,7 @@ function addMessage(message) {
 sendBtn.addEventListener("click", () => {
   const text = chatInput.value.trim();
   if (!text) return;
-
-  const now = new Date();
-  const hh = now.getHours().toString().padStart(2, "0");
-  const mm = now.getMinutes().toString().padStart(2, "0");
-
-  addMessage({
-    sender: "私",
-    text,
-    read: false,
-    readCount: 0,
-    readers: [],
-    time: `${hh}:${mm}`
-  });
-
+  sendMessage(text);
   chatInput.value = "";
 });
 
@@ -84,21 +113,14 @@ chatInput.addEventListener("keydown", (e) => {
   }
 });
 
-// 📂ボタンはファイル選択ダイアログを表示
+// ファイル送信
 fileBtn.addEventListener("click", () => {
   const input = document.createElement("input");
   input.type = "file";
   input.multiple = true;
   input.onchange = () => {
     Array.from(input.files).forEach(file => {
-      addMessage({
-        sender: "私",
-        text: `[ファイル送信] ${file.name}`,
-        read: false,
-        readCount: 0,
-        readers: [],
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
+      sendMessage(`[ファイル送信] ${file.name}`);
     });
   };
   input.click();
