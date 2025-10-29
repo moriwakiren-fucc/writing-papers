@@ -37,6 +37,32 @@ function sendMessage(text) {
 
 // 受信・表示
 const messagesRef = ref(db, "chat_messages");
+import { ref, push, onChildAdded, update, get, child } 
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+// 👇 これを追加
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+const dbRef = ref(db, "chat_messages");
+
+// ページ読み込み時に過去のメッセージを全部取得
+get(dbRef).then(snapshot => {
+  if (snapshot.exists()) {
+    const messages = snapshot.val();
+    Object.entries(messages).forEach(([key, data]) => {
+      const readCount = data.readBy ? data.readBy.length : 0;
+      addMessage({
+        id: key,
+        sender: members.find(m => m.email === data.senderEmail)?.name || data.senderEmail,
+        text: data.text,
+        readCount,
+        readers: data.readBy || [],
+        time: data.timestamp,
+        read: !data.readBy.includes(currentUser.email)
+      });
+    });
+  }
+});
+
 onChildAdded(messagesRef, (snapshot) => {
   const data = snapshot.val();
   const key = snapshot.key;
