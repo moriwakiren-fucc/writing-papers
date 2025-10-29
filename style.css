@@ -1,1 +1,128 @@
+/* 全体リセット */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* お知らせバナー */
+.banner {
+  background-color: #FFFF00;
+  text-align: center;
+  padding: 8px 0;
+  font-weight: bold;
+}
+
+/* ヘッダー */
+header {
+  position: fixed;
+  top: 28px; /* バナーの下 */
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #5563DE;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+header .menu-btn {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+header .header-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+header .header-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* サイドメニュー */
+.side-menu {
+  position: fixed;
+  top: 88px; /* ヘッダーの下 */
+  left: -250px; /* 初期は隠す */
+  width: 250px;
+  height: 100%;
+  background-color: #333;
+  color: white;
+  transition: left 0.3s;
+  z-index: 999;
+  padding-top: 20px;
+}
+
+.side-menu ul {
+  list-style: none;
+}
+
+.side-menu li {
+  padding: 12px 20px;
+}
+
+.side-menu a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.side-menu .unread-count {
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  padding: 2px 6px;
+  margin-left: 8px;
+}
+
+/* メイン */
+main {
+  margin-top: 88px; /* ヘッダーの下 */
+  padding: 20px;
+}
+
+main h1 {
+  font-size: 3em;
+  height: 20vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* お知らせセクション */
+.announcements h2 {
+  margin-bottom: 12px;
+}
+
+.announcement {
+  margin-bottom: 12px;
+}
+
+.announcement h4 {
+  cursor: pointer;
+  user-select: none;
+}
+
+.announcement .content {
+  display: none;
+  margin: 6px 0 12px 0;
+}
+
+.announcement hr {
+  border: none;
+  border-top: 1px dotted #999;
+}
 
