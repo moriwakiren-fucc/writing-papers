@@ -1,158 +1,58 @@
-/* 全体リセット */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>論文制作ページ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- お知らせバナー -->
+  <div class="banner">頑張ろう！！</div>
 
-/* お知らせバナー */
-.banner {
-  background-color: #FFFF00;
-  text-align: center;
-  padding: 8.4px 0; /* 以前の12pxの0.7倍 */
-  font-weight: bold;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1001;
-}
+  <!-- ヘッダー -->
+  <header>
+    <button class="menu-btn" id="menu-btn">&#9776;</button>
+    <img src="imgs/commons/icons.png" alt="アイコン" class="header-icon">
+    <span class="header-title">論文制作ページ</span>
+  </header>
 
-/* ヘッダー */
-header {
-  position: fixed;
-  top: 8.4px * 2; /* バナー下 */
-  left: 0;
-  width: 100%;
-  height: 63px; /* 以前の90pxの0.7倍 */
-  background-color: white;
-  border-bottom: 2px solid #444444;
-  display: flex;
-  align-items: center; /* 上下中央揃え */
-  padding: 0 20px;
-  z-index: 1000;
-}
+  <!-- サイドメニュー -->
+  <nav id="side-menu" class="side-menu">
+    <ul>
+      <li><a href="#">チャット <span class="unread-count" id="unread-count">0</span></a></li>
+      <li><a href="#">コンテンツ</a></li>
+      <li><a href="#" id="logout-btn">ログアウト</a></li>
+    </ul>
+  </nav>
 
-header .menu-btn {
-  font-size: 25.2px; /* 以前の36pxの0.7倍 */
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 10px;
-}
+  <!-- メイン -->
+  <main>
+    <h1>論文制作ページ</h1>
+    <section class="announcements">
+      <h2>お知らせ</h2>
 
-header .header-icon {
-  width: 33.6px; /* 以前の48pxの0.7倍 */
-  height: 33.6px;
-  margin-right: 10px;
-}
+      <div class="announcement">
+        <h3 class="toggle-btn">お知らせ1 ▼</h3>
+        <p class="content">お知らせ1の詳細内容がここに入ります。</p>
+        <hr>
+      </div>
 
-header .header-title {
-  font-size: 21px; /* 以前の30pxの0.7倍 */
-  font-weight: bold;
-  display: flex;
-  align-items: center; /* アイコンと文字を上下中央揃え */
-}
+      <div class="announcement">
+        <h3 class="toggle-btn">お知らせ2 ▼</h3>
+        <p class="content">お知らせ2の詳細内容がここに入ります。</p>
+        <hr>
+      </div>
 
-/* サイドメニュー */
-.side-menu {
-  position: fixed;
-  top: calc(8.4px*2 + 63px); /* バナー＋ヘッダー分 */
-  left: -250px;
-  width: 250px;
-  height: 100%;
-  background-color: #333;
-  color: white;
-  transition: left 0.3s;
-  z-index: 999;
-  padding-top: 20px;
-}
+      <div class="announcement">
+        <h3 class="toggle-btn">お知らせ3 ▼</h3>
+        <p class="content">お知らせ3の詳細内容がここに入ります。</p>
+        <hr>
+      </div>
+    </section>
 
-.side-menu ul {
-  list-style: none;
-}
+  </main>
 
-.side-menu li {
-  padding: 12px 20px;
-}
-
-.side-menu a {
-  color: white;
-  text-decoration: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.side-menu .unread-count {
-  background-color: red;
-  color: white;
-  font-size: 12px;
-  border-radius: 50%;
-  padding: 2px 6px;
-  margin-left: 8px;
-}
-
-/* メイン */
-main {
-  margin-top: calc(8.4px*2 + 63px); /* バナー＋ヘッダー分 */
-  padding: 20px;
-}
-
-main h1 {
-  font-size: 3em;
-  height: 20vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* お知らせセクション */
-.announcements h2 {
-  font-size: calc(3em / 3 * 2); /* h1の3分の2 */
-  margin-bottom: 12px;
-}
-
-.announcement {
-  margin-bottom: 12px;
-}
-
-.announcement h3 { /* h4 → h3 */
-  cursor: pointer;
-  user-select: none;
-  font-size: calc((3em / 3 * 2) * 2 / 3); /* pのh2の2分の3 */
-}
-
-.announcement .content {
-  display: none;
-  margin: 6px 0 12px 0;
-}
-
-.announcement hr {
-  border: none;
-  border-top: 1px dotted #999;
-}
-
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-  header .header-title {
-    font-size: 18px;
-  }
-
-  header .header-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  main h1 {
-    font-size: 2em;
-  }
-
-  .announcements h2 {
-    font-size: 1.5em;
-  }
-
-  .announcement h3 {
-    font-size: 1.1em;
-  }
-}
+  <script type="module" src="main.js"></script>
+</body>
+</html>
