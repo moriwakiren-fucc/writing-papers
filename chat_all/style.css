@@ -133,5 +133,5 @@ header {
 }
 
 .chat-input-area button {
-  height: 100%;
+  height: calc(2.25em - 10px);
 }
