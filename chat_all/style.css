@@ -133,5 +133,6 @@ header {
 }
 
 .chat-input-area button img {
-  height: calc(2.25em - 10px);
+  height: 100%;
+  width: 100%;
 }
