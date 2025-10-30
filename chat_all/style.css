@@ -23,6 +23,12 @@ h2 a {
 h1 {
   display: inline-block;
   height: 100%;
+  background-color:#ab010b;
+  width:40px;
+  height:40px;
+  position:absolute;
+  left:50%;
+  transform: translateX(-50%);
 }
 
 header {
