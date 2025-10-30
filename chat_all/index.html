@@ -4,10 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>チャット | 論文制作ページ</title>
-  <link rel="stylesheet" href="style.css?v=8">
-  <script type="module" src="main.js?v=8"></script>
-  <!-- Firebase SDKは後で追加 -->
+  <script>
+    // 1以上1000000以下の乱数を生成
+    const version = Math.floor(Math.random() * 1000000) + 1;
+
+    // CSSを動的に読み込み
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = `style.css?v=${version}`;
+    document.head.appendChild(css);
+
+    // JSを動的に読み込み
+    const js = document.createElement("script");
+    js.type = "module";
+    js.src = `main.js?v=${version}`;
+    document.head.appendChild(js);
+  </script>
 </head>
+  
 <body>
   <header>
     <h2><a href="../">＜</a></h2><h1>チャット</h1>
