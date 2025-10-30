@@ -12,7 +12,7 @@ h2 {
   position: fixed;
   left: 5%;
   height: 100%;
-  width: 2em;
+  width: 2.5em;
   text-align: left;
   display: inline-block;
 }
@@ -24,9 +24,9 @@ h2 a {
 
 h1 {
   display: inline-block;
-  width: 6em;
+  width: 8em;
   text-align: center;
-  margin-left: calc(50% - 5em);
+  margin-left: calc(50% - 6.5em);
 }
 
 header {
