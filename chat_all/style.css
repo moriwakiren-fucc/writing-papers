@@ -126,6 +126,7 @@ header {
 }
 
 .chat-input-area button {
+  width: 2.25em;
   height: 2.25em;
   background: none;
   border: none;
