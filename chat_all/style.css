@@ -132,6 +132,6 @@ header {
   cursor: pointer;
 }
 
-.chat-input-area button {
+.chat-input-area button img {
   height: calc(2.25em - 10px);
 }
