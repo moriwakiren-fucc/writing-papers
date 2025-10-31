@@ -5,19 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>チャット | 論文制作ページ</title>
   <script>
-    const version = Math.floor(Math.random() * 1000000) + 1;
+    window.addEventListener("DOMContentLoaded", () => {
+      const version = Math.floor(Math.random() * 1000000) + 1;
   
-    // CSS
-    const css = document.createElement("link");
-    css.rel = "stylesheet";
-    css.href = `style.css?v=${version}`;
-    document.head.appendChild(css);
-
-    // JS
-    const js = document.createElement("script");
-    js.src = `main.js?v=${version}`;
-    document.head.appendChild(js);
+      // CSSを読み込み
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = `style.css?v=${version}`;
+      document.head.appendChild(css);
+  
+      // JSを読み込み（読み込み完了後に実行）
+      const js = document.createElement("script");
+      js.src = `main.js?v=${version}`;
+      js.defer = true; // HTMLの読み込み後に実行
+      document.body.appendChild(js);
+  
+      console.log("version:", version);
+    });
   </script>
+
 
 </head>
   
