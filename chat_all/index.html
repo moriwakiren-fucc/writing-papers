@@ -52,5 +52,14 @@
     <video id="video-player" controls></video>
     <button id="video-close" class="video-close" aria-label="閉じる">✕</button>
   </div>
+  <script type="module">
+    // 0〜999999 のランダム値生成
+    const vRand = Math.floor(Math.random() * 1000000);
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src = `./main.js?v=${vRand}`; // ランダム値付き
+    document.body.appendChild(script);
+  </script>
+
 </body>
 </html>
