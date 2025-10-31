@@ -1,149 +1,102 @@
-body {
-  font-family: "Segoe UI", sans-serif;
-  background-color: #f4f6f8;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+/* 基本リセット */
+* { box-sizing: border-box; }
+html, body { height:100%; margin:0; padding:0; font-family: 'Segoe UI', Arial, sans-serif; }
+body { background:#9cb2d9; display:flex; flex-direction:column; }
 
-.chat-wrapper {
-  width: 100%;
-  max-width: 720px;
-  height: 90vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  overflow: hidden;
-}
-
+/* ヘッダー */
 header {
-  background: #1976d2;
-  color: white;
-  padding: 10px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: fixed; top:0; left:0; right:0;
+  height:3.2rem; background: #fff; border-bottom:1px solid #444;
+  display:flex; align-items:center; gap:0.75rem; padding:0 0.75rem; z-index:40;
 }
+header h2 { margin:0; font-size:1.6rem; }
+header h2 a { text-decoration:none; color:#000; }
+header h1 { margin:0; font-size:1.4rem; font-weight:700; text-align:center; flex:1; }
 
-header h1 {
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-header button {
-  background: #fff;
-  color: #1976d2;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-header button:hover {
-  background: #e3f2fd;
-}
-
-.messages {
-  flex: 1;
-  padding: 16px;
+/* メイン */
+#chat-container {
+  margin-top: calc(3.2rem + 0.5rem);
+  margin-bottom: calc(3.8rem + 0.5rem);
+  padding: 0.75rem;
   overflow-y: auto;
-  background: #f9fafc;
+  flex:1;
 }
 
-footer {
-  display: flex;
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  background: #f4f6f8;
+/* 日付区切り */
+.date-divider { text-align:center; color:#333; margin:0.5rem 0; font-size:0.9rem; opacity:0.9; }
+
+/* メッセージ行 */
+.message-row { display:flex; flex-direction:row; align-items:flex-end; gap:0.5rem; margin:6px 0; }
+
+/* 吹き出し */
+.chat-bubble {
+  max-width:75%;
+  padding:10px;
+  border-radius:12px;
+  word-break:break-word;
+  background:#fff;
+  text-align:left;
 }
 
-footer input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-}
+/* 右側（自分）と左側（他者） */
+.chat-bubble.right { background:#98e887; margin-left:auto; }
+.chat-bubble.left { background:#ffffff; margin-right:auto; }
 
-footer button {
-  margin-left: 10px;
-  padding: 8px 16px;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+/* 送信者名（吹き出し外、0.5em） */
+.sender { font-size:0.5em; font-weight:700; margin-bottom:2px; color:#222; }
 
-footer button:hover {
-  background: #1565c0;
-}
+/* 本文 */
+.bubble-text { white-space:pre-wrap; }
 
-/* ============================
-   メッセージデザイン
-============================ */
-.message {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 14px;
-}
+/* 画像プレビュー */
+.bubble-media { display:block; max-width:100%; border-radius:8px; }
 
-.my-message {
-  align-items: flex-end;
+/* 動画サムネ */
+.video-thumb { position:relative; display:inline-block; max-width:100%; }
+.video-thumb .thumb-overlay {
+  position:absolute; inset:0; background: rgba(0,0,0,0.66); border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
 }
+.video-thumb .thumb-overlay .play { color:#fff; font-size:2rem; opacity:0.95; }
 
-.other-message {
-  align-items: flex-start;
+/* メタ情報（吹き出し外、時刻と既読数） */
+.msg-meta { display:flex; flex-direction:column; font-size:0.75rem; color:#222; opacity:0.9; min-width:5rem; }
+.msg-meta.self { align-items:flex-start; } /* 自分：左下 */
+.msg-meta.other { align-items:flex-end; } /* 他人：右下 */
+
+.meta-time {}
+.meta-read { margin-top:2px; }
+
+/* 未読メッセージは黒太線で囲む */
+.chat-bubble.unread { outline: 3px solid #000; outline-offset: 2px; }
+
+/* 入力帯 */
+.chat-input-area {
+  position: fixed; left:0; right:0; bottom:0; display:flex; gap:0.5rem;
+  align-items:center; padding:8px; background:#fff; z-index:50;
 }
-
-.bubble {
-  max-width: 70%;
-  padding: 10px 14px;
-  border-radius: 16px;
-  line-height: 1.5;
-  font-size: 14px;
-  word-wrap: break-word;
-  background: #e3f2fd;
-  position: relative;
+.chat-input-area textarea {
+  flex:1; resize:none; padding:8px; border-radius:8px; border:1px solid #ccc;
+  background:#F5F5F5; min-height:44px; max-height:140px; overflow:auto;
 }
-
-.my-message .bubble {
-  background: #bbdefb;
+.chat-input-area button {
+  border:none; background:transparent; cursor:pointer; padding:6px; flex:0 0 44px;
 }
+.chat-input-area button img { max-height:100%; max-width:100%; object-fit:contain; }
 
-.other-message .bubble {
-  background: #fff;
-  border: 1px solid #ddd;
-}
+/* 動画モーダル */
+.video-modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.9); z-index:1000; }
+.video-modal.show { display:flex; }
+#video-player { max-width:98%; max-height:98%; }
+.video-close { position:absolute; top:1rem; right:1rem; font-size:1.4rem; background:transparent; color:#fff; border:none; cursor:pointer; }
 
-/* 吹き出しの下に時刻・既読 */
-.time-read {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  opacity: 0.85;
-}
+/* リンク */
+.chat-bubble a { color: #0645ad; text-decoration:underline; }
 
-.time-read.left {
-  text-align: left;
-  margin-left: 4px;
-}
-
-.time-read.right {
-  text-align: right;
-  margin-right: 4px;
-}
-
-.time {
-  display: inline-block;
-}
-
-.read {
-  display: inline-block;
+/* レスポンシブ */
+@media (max-width:600px) {
+  header h2 { font-size:1.4rem; }
+  header h1 { font-size:1.1rem; }
+  .sender { font-size:0.4em; }
+  .msg-meta { font-size:0.7rem; min-width:4rem; }
 }
