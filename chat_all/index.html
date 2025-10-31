@@ -1,100 +1,96 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>チャット | 論文制作ページ</title>
+
+  <!-- 🔹 Networkモニター（fetch + WebSocket対応） -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      // === Networkモニター領域 ===
+      const netBox = document.createElement("div");
+      netBox.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-height: 180px;
+        overflow-y: auto;
+        background: rgba(0,0,0,0.85);
+        color: #00ff99;
+        font-family: monospace;
+        font-size: 13px;
+        padding: 5px 10px;
+        z-index: 99999;
+        white-space: nowrap;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      `;
+      netBox.innerHTML = "🛰 <b>Network Monitor</b><br>";
+      document.body.appendChild(netBox);
+
+      // === fetch監視 ===
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        const url = args[0];
+        const method = (args[1]?.method || "GET").toUpperCase();
+        const time = new Date().toLocaleTimeString();
+
+        const logLine = document.createElement("div");
+        logLine.textContent = `[${time}] ${method} → ${url}`;
+        netBox.appendChild(logLine);
+        netBox.scrollTop = netBox.scrollHeight;
+
+        try {
+          const response = await originalFetch(...args);
+          return response;
+        } catch (e) {
+          const errLine = document.createElement("div");
+          errLine.style.color = "#ff5555";
+          errLine.textContent = `✗ ${method} ${url} （通信失敗）`;
+          netBox.appendChild(errLine);
+          return Promise.reject(e);
+        }
+      };
+
+      // === WebSocket監視 ===
+      const OriginalWebSocket = window.WebSocket;
+      window.WebSocket = function (...args) {
+        const url = args[0];
+        const time = new Date().toLocaleTimeString();
+        const logLine = document.createElement("div");
+        logLine.style.color = "#99ccff";
+        logLine.textContent = `[${time}] 🔌 WebSocket接続 → ${url}`;
+        netBox.appendChild(logLine);
+        netBox.scrollTop = netBox.scrollHeight;
+        return new OriginalWebSocket(...args);
+      };
+    });
+  </script>
+
+  <!-- 🔹 CSS + JSを確実に読み込む -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       const version = Math.floor(Math.random() * 1000000) + 1;
-  
-      // CSSを読み込み
+
+      // CSS
       const css = document.createElement("link");
       css.rel = "stylesheet";
       css.href = `style.css?v=${version}`;
       document.head.appendChild(css);
-  
-      // JSを読み込み（読み込み完了後に実行）
+
+      // JS（モジュール対応で確実に実行）
       const js = document.createElement("script");
+      js.type = "module";
       js.src = `main.js?v=${version}`;
-      js.defer = true; // HTMLの読み込み後に実行
       document.body.appendChild(js);
-  
+
       console.log("version:", version);
-
     });
-
   </script>
-
-
 </head>
-  
+
 <body>
-<script>
-/* -----------------------------
-   🔍 簡易 Network モニター
-   （fetch通信を監視）
------------------------------- */
-
-// モニター領域を作成
-const netBox = document.createElement("div");
-netBox.style.cssText = `
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  max-height: 180px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.85);
-  color: #00ff99;
-  font-family: monospace;
-  font-size: 13px;
-  padding: 5px 10px;
-  z-index: 99999;
-  white-space: nowrap;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-`;
-netBox.innerHTML = "🛰 <b>Network Monitor</b><br>";
-document.body.appendChild(netBox);
-
-// fetchをフックして通信ログを表示
-const originalFetch = window.fetch;
-window.fetch = async (...args) => {
-  const url = args[0];
-  const method = (args[1]?.method || "GET").toUpperCase();
-  const time = new Date().toLocaleTimeString();
-
-  const logLine = document.createElement("div");
-  logLine.textContent = `[${time}] ${method} → ${url}`;
-  netBox.appendChild(logLine);
-  netBox.scrollTop = netBox.scrollHeight;
-
-  // 通信を実行（エラーでもそのまま返す）
-  try {
-    const response = await originalFetch(...args);
-    return response;
-  } catch (e) {
-    const errLine = document.createElement("div");
-    errLine.style.color = "#ff5555";
-    errLine.textContent = `✗ ${method} ${url} （通信失敗）`;
-    netBox.appendChild(errLine);
-    return Promise.reject(e);
-  }
-};
-// WebSocket 通信も監視
-const OriginalWebSocket = window.WebSocket;
-window.WebSocket = function (...args) {
-  const url = args[0];
-  const time = new Date().toLocaleTimeString();
-  const logLine = document.createElement("div");
-  logLine.style.color = "#99ccff";
-  logLine.textContent = `[${time}] 🔌 WebSocket接続 → ${url}`;
-  netBox.appendChild(logLine);
-  netBox.scrollTop = netBox.scrollHeight;
-  return new OriginalWebSocket(...args);
-};
-</script>
-
   <header>
     <h2><a href="../">《</a></h2><h1>チャット</h1>
   </header>
@@ -111,7 +107,5 @@ window.WebSocket = function (...args) {
       <img src="../imgs/chat/send.png" alt="送信">
     </button>
   </div>
-
 </body>
 </html>
-
