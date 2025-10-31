@@ -123,7 +123,7 @@ header {
   border-radius: 8px;
   border: 1px solid #ccc;
   margin: 0 8px;
-  width: calc(100% - 5em - 32px);
+  width: calc(100% - 5em - 48px);
 }
 
 .chat-input-area button {
@@ -135,6 +135,6 @@ header {
 }
 
 .chat-input-area button img {
-  height: 2.25em;
-  width: 2.25em;
+  height: 100%;
+  width: 100%;
 }
