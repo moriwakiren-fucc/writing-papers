@@ -1,79 +1,116 @@
 // main.js (モジュール)
-// Firebase Realtime DB と Auth（login/firebase-config.js が初期化済みで export している想定）
-import { db, auth } from "../login/firebase-config.js?v=" + Math.floor(Math.random() * 1000000);
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+// Firebase Realtime DB と Auth（login/firebase-config.js が初期化済みで export している想定）import { db, auth } from "../login/firebase-config.js";
 import {
   ref,
+  onValue,
   push,
-  onChildAdded,
+  set,
   update,
   get,
-  query,
-  orderByChild
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+  child,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+const messageInput = document.getElementById("message-input");
+const sendBtn = document.getElementById("send-btn");
+const messagesDiv = document.getElementById("messages");
 
 let currentUser = null;
-const members = [
-  {email: "moriwaki@ren.ronbun", name: "森脇 廉"},
-  {email: "muraya@kaho.ronbun", name: "村谷 佳穂"},
-  {email: "kojo@yuina.ronbun", name: "小城 結菜"},
-  {email: "nakano@aiko.ronbun", name: "中野 愛子"},
-  {email: "kamimoto@yuta.ronbun", name: "神元 佑太"},
-  {email: "sadahira@koto.ronbun", name: "定平 琴"},
-  {email: "sunada@suzu.ronbun", name: "砂田 紗々"}
-];
 
-// DOM取得
-const chatContainer = document.getElementById("chat-container");
-const chatInput = document.getElementById("chat-input");
-const sendBtn = document.getElementById("send-btn");
-const fileBtn = document.getElementById("file-btn");
-const videoModal = document.getElementById("video-modal");
-const videoPlayer = document.getElementById("video-player");
-const videoClose = document.getElementById("video-close");
-const storage = getStorage();
-
-/* -------------------------
-   認証チェック
---------------------------*/
-onAuthStateChanged(auth, user => {
-  if (!user) {
+// ========================
+// ログイン状態の監視
+// ========================
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    console.log("ログイン中:", user.email);
+    startChat();
+  } else {
     window.location.href = "../login/index.html";
-    return;
   }
-  const member = members.find(m => m.email === user.email);
-  currentUser = {
-    email: user.email,
-    uid: user.uid,
-    name: member ? member.name : user.email
-  };
-  initChat();
 });
 
-/* -------------------------
-   メッセージ送信
---------------------------*/
-function sendMessage(payload) {
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
+// ========================
+// チャットの読み込みと既読反映
+// ========================
+function startChat() {
+  const messagesRef = ref(db, "chat_all/messages");
 
-  const messageRef = ref(db, "chat_messages");
-  push(messageRef, {
-    senderEmail: currentUser.email,
-    senderName: currentUser.name,
-    text: payload.text || "",
-    fileType: payload.fileType || null,
-    fileURL: payload.fileURL || null,
-    thumbURL: payload.thumbURL || null,
-    fileName: payload.fileName || null,
-    timestamp: `${hh}:${mm}`,
-    date: now.toLocaleDateString("ja-JP"),
-    timeValue: now.getTime(),
-    readBy: [] // ← 自分は含めない
+  onValue(messagesRef, async (snapshot) => {
+    const data = snapshot.val();
+    messagesDiv.innerHTML = "";
+
+    if (!data) return;
+
+    const entries = Object.entries(data);
+
+    for (const [key, msg] of entries) {
+      const msgElement = document.createElement("div");
+      msgElement.classList.add("message");
+      msgElement.classList.add(
+        msg.uid === currentUser.uid ? "my-message" : "other-message"
+      );
+
+      // 既読人数
+      const readCount = msg.readBy ? Object.keys(msg.readBy).length : 0;
+
+      msgElement.innerHTML = `
+        <div class="bubble">
+          <p>${msg.text}</p>
+          <div class="time-read ${
+            msg.uid === currentUser.uid ? "left" : "right"
+          }">
+            <span class="time">${msg.time}</span><br>
+            <span class="read">既読 ${readCount}人</span>
+          </div>
+        </div>
+      `;
+
+      messagesDiv.appendChild(msgElement);
+
+      // ✅ 自分が既読していないメッセージを即時更新
+      if (!msg.readBy || !msg.readBy[currentUser.uid]) {
+        const readPath = `chat_all/messages/${key}/readBy/${currentUser.uid}`;
+        await set(ref(db, readPath), true);
+      }
+    }
+
+    // スクロールを常に下に
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
 }
+
+// ========================
+// メッセージ送信
+// ========================
+sendBtn.addEventListener("click", sendMessage);
+messageInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text || !currentUser) return;
+
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2, "0")}:${now
+    .getMinutes()
+    .toString()
+    .padStart(2, "0")}`;
+
+  const newMsgRef = push(ref(db, "chat_all/messages"));
+  await set(newMsgRef, {
+    uid: currentUser.uid,
+    text: text,
+    time: time,
+    readBy: { [currentUser.uid]: true }, // 自分は送信時点で既読
+  });
+
+  messageInput.value = "";
+}
+
 
 /* -------------------------
    メッセージDOM生成
