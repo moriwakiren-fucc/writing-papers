@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { firebaseConfig } from "./firebase-config.js";
+const v = Math.floor(Math.random() * 1000000) + 1
+const js = `./firevase-config.js?v=${v}`;
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
