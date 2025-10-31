@@ -81,6 +81,18 @@ window.fetch = async (...args) => {
     return Promise.reject(e);
   }
 };
+// WebSocket 通信も監視
+const OriginalWebSocket = window.WebSocket;
+window.WebSocket = function (...args) {
+  const url = args[0];
+  const time = new Date().toLocaleTimeString();
+  const logLine = document.createElement("div");
+  logLine.style.color = "#99ccff";
+  logLine.textContent = `[${time}] 🔌 WebSocket接続 → ${url}`;
+  netBox.appendChild(logLine);
+  netBox.scrollTop = netBox.scrollHeight;
+  return new OriginalWebSocket(...args);
+};
 </script>
 
   <header>
