@@ -15,7 +15,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/f
 /* -------------------------
    メンバー情報（メール→表示名）
 --------------------------*/
-let currentUser = null; // { email, uid, name }
+let currentUser = null;
 const members = [
   {email: "moriwaki@ren.ronbun", name: "森脇 廉"},
   {email: "muraya@kaho.ronbun", name: "村谷 佳穂"},
@@ -81,7 +81,7 @@ function sendMessage(payload) {
     timestamp: `${hh}:${mm}`,
     date,
     timeValue: now.getTime(),
-    readBy: [currentUser.email] // 最初は自分を既読に
+    readBy: { [currentUser.email]: true } // オブジェクト形式
   });
 }
 
@@ -105,7 +105,6 @@ function addMessageToDOM(msg) {
 
   const bubble = document.createElement("div");
   bubble.className = "chat-bubble " + (isMine ? "right" : "left");
-  if (msg.unread) bubble.classList.add("unread");
 
   if (!isMine) {
     const senderEl = document.createElement("div");
@@ -125,11 +124,43 @@ function addMessageToDOM(msg) {
   textEl.innerHTML = safeText;
   bubble.appendChild(textEl);
 
-  // ファイル処理略（元コードと同じ）
+  // ファイル表示
+  if (msg.fileType && msg.fileURL) {
+    if (msg.fileType.startsWith("image/")) {
+      const img = document.createElement("img");
+      img.src = msg.fileURL;
+      img.className = "bubble-media";
+      bubble.appendChild(img);
+    } else if (msg.fileType.startsWith("video/")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "video-thumb";
+      const img = document.createElement("img");
+      img.src = msg.thumbURL || msg.fileURL;
+      img.className = "bubble-media";
+      wrapper.appendChild(img);
+
+      const overlay = document.createElement("div");
+      overlay.className = "thumb-overlay";
+      overlay.innerHTML = `<div class="play">▶︎</div>`;
+      wrapper.appendChild(overlay);
+
+      wrapper.addEventListener("click", () => {
+        videoPlayer.src = msg.fileURL;
+        videoModal.classList.add("show");
+        videoModal.setAttribute("aria-hidden", "false");
+      });
+
+      bubble.appendChild(wrapper);
+    } else {
+      const fileEl = document.createElement("div");
+      fileEl.innerHTML = `<a href="${msg.fileURL}" target="_blank" rel="noopener noreferrer">${escapeHtml(msg.fileName || 'ファイル')}</a>`;
+      bubble.appendChild(fileEl);
+    }
+  }
 
   const meta = document.createElement("div");
   meta.className = "msg-meta";
-  const readCount = (msg.readBy ? msg.readBy.length : 0);
+  const readCount = msg.readBy ? Object.keys(msg.readBy).length : 0;
   const readEl = document.createElement("div");
   readEl.className = "meta-read";
   readEl.textContent = `既読：${readCount}`;
@@ -141,10 +172,10 @@ function addMessageToDOM(msg) {
   meta.appendChild(timeEl);
 
   bubble.addEventListener("dblclick", () => {
-    const readers = (msg.readBy || []).map(email => {
+    const readers = msg.readBy ? Object.keys(msg.readBy).map(email => {
       const m = members.find(x => x.email === email);
       return m ? m.name : email;
-    });
+    }) : [];
     alert(`既読順：\n${readers.join("\n") || "(なし)"}`);
   });
 
@@ -160,6 +191,70 @@ function escapeHtml(s) {
 }
 
 /* -------------------------
+   ファイルアップロード処理
+--------------------------*/
+async function uploadFileAndSend(file) {
+  try {
+    const now = Date.now();
+    const path = `chat_files/${now}_${file.name}`;
+    const sRef = storageRef(storage, path);
+    const snapshot = await uploadBytes(sRef, file);
+    const url = await getDownloadURL(sRef);
+
+    if (file.type.startsWith("image/")) {
+      sendMessage({ fileType: file.type, fileURL: url, fileName: file.name });
+      return;
+    }
+
+    if (file.type.startsWith("video/")) {
+      const thumbBlob = await captureVideoThumbnail(file);
+      let thumbURL = null;
+      if (thumbBlob) {
+        const thumbPath = `chat_files/thumb_${now}_${file.name}.png`;
+        const tRef = storageRef(storage, thumbPath);
+        await uploadBytes(tRef, thumbBlob);
+        thumbURL = await getDownloadURL(tRef);
+      }
+      sendMessage({ fileType: file.type, fileURL: url, thumbURL, fileName: file.name });
+      return;
+    }
+
+    sendMessage({ fileType: file.type, fileURL: url, fileName: file.name });
+
+  } catch (e) {
+    console.error("upload failed:", e);
+    alert("ファイル送信に失敗しました");
+  }
+}
+
+/* -------------------------
+   動画サムネ生成
+--------------------------*/
+function captureVideoThumbnail(file) {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.src = URL.createObjectURL(file);
+    video.muted = true;
+    video.playsInline = true;
+
+    video.addEventListener("loadeddata", () => {
+      video.currentTime = 1;
+    });
+
+    video.addEventListener("seeked", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => resolve(blob), "image/png");
+      URL.revokeObjectURL(video.src);
+    });
+  });
+}
+
+/* -------------------------
    初期ロード & リアルタイム監視
 --------------------------*/
 let initialized = false;
@@ -172,51 +267,30 @@ function initChat() {
     if (snapshot.exists()) {
       const data = snapshot.val();
       Object.entries(data).forEach(([key, d]) => {
-        addMessageToDOM({
-          id: key,
-          senderEmail: d.senderEmail,
-          senderName: d.senderName,
-          text: d.text,
-          fileType: d.fileType,
-          fileURL: d.fileURL,
-          thumbURL: d.thumbURL,
-          fileName: d.fileName,
-          timestamp: d.timestamp,
-          date: d.date,
-          readBy: d.readBy || []
-        });
+        const readBy = d.readBy || {};
+        if (!readBy[currentUser.email]) {
+          readBy[currentUser.email] = true;
+          set(ref(db, `chat_messages/${key}/readBy`), readBy).catch(console.error);
+        }
+        addMessageToDOM({ id:key, ...d, readBy });
       });
     }
-  }).catch(err => console.error("history error:", err));
+  }).catch(console.error);
 
   const liveRef = ref(db, "chat_messages");
-  onChildAdded(liveRef, (snap) => {
+  onChildAdded(liveRef, snap => {
     const d = snap.val();
-    addMessageToDOM({
-      id: snap.key,
-      senderEmail: d.senderEmail,
-      senderName: d.senderName,
-      text: d.text,
-      fileType: d.fileType,
-      fileURL: d.fileURL,
-      thumbURL: d.thumbURL,
-      fileName: d.fileName,
-      timestamp: d.timestamp,
-      date: d.date,
-      readBy: d.readBy || []
-    });
-
-    // --- 既読処理を set() に変更 ---
-    if (!d.readBy || !d.readBy.includes(currentUser.email)) {
-      const path = `chat_messages/${snap.key}/readBy`;
-      const updatedReadBy = [...(d.readBy || []), currentUser.email];
-      set(ref(db, path), updatedReadBy).catch(e => console.error("set readBy failed:", e));
+    const readBy = d.readBy || {};
+    if (!readBy[currentUser.email]) {
+      readBy[currentUser.email] = true;
+      set(ref(db, `chat_messages/${snap.key}/readBy`), readBy).catch(console.error);
     }
+    addMessageToDOM({ id: snap.key, ...d, readBy });
   });
 }
 
 /* -------------------------
-   イベント：送信ボタン / Enter送信 / ファイル選択
+   送信 / Enter / ファイル選択イベント
 --------------------------*/
 sendBtn.addEventListener("click", () => {
   const text = chatInput.value;
@@ -232,7 +306,6 @@ chatInput.addEventListener("keydown", (e) => {
   }
 });
 
-// ファイル選択
 fileBtn.addEventListener("click", () => {
   const input = document.createElement("input");
   input.type = "file";
@@ -246,7 +319,7 @@ fileBtn.addEventListener("click", () => {
 });
 
 /* -------------------------
-   動画モーダルのクローズ処理
+   動画モーダルのクローズ
 --------------------------*/
 videoClose.addEventListener("click", () => {
   videoPlayer.pause();
@@ -255,16 +328,14 @@ videoClose.addEventListener("click", () => {
   videoModal.setAttribute("aria-hidden", "true");
 });
 videoModal.addEventListener("click", (e) => {
-  if (e.target === videoModal) {
-    videoClose.click();
-  }
+  if (e.target === videoModal) videoClose.click();
 });
 
 /* -------------------------
-   既読者表示：DBから読者配列を取得して名前へ変換して返す
+   既読者表示
 --------------------------*/
 function readerNamesFromEmails(emails) {
-  return (emails || []).map(email => {
+  return Object.keys(emails || {}).map(email => {
     const m = members.find(x => x.email === email);
     return m ? m.name : email;
   });
