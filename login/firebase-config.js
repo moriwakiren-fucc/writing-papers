@@ -3,14 +3,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/fireba
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyB64DJKPuX8MOhqV4fEBl6jwl1B5PjleRQ",
+  authDomain: "writing-papers.firebaseapp.com",
+  databaseURL: "https://writing-papers-default-rtdb.firebaseio.com",
+  projectId: "writing-papers",
+  storageBucket: "writing-papers.firebasestorage.app",
+  messagingSenderId: "14120068197",
+  appId: "1:14120068197:web:699751e2e6cd58f7f6128c",
+  measurementId: "G-B43V1G22CV"
 };
 
 export const app = initializeApp(firebaseConfig);
