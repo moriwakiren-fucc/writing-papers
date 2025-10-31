@@ -24,12 +24,6 @@
 
     });
 
-      // fetchをフックして通信URLを表示
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        console.log("🔗 Fetch:", args[0]);
-        return originalFetch(...args);
-      };
   </script>
 
 
@@ -46,6 +40,13 @@
       msg.textContent = args.join(" ");
       debugBox.appendChild(msg);
     };
+    
+      // fetchをフックして通信URLを表示
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        console.log("🔗 Fetch:", args[0]);
+        return originalFetch(...args);
+      };
 
     console.log("デバッグモードON");
   </script> 
