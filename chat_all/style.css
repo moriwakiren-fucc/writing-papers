@@ -132,6 +132,7 @@ header {
   background: none;
   border: none;
   cursor: pointer;
+  flex: 1;
 }
 
 .chat-input-area button img {
