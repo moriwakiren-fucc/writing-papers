@@ -4,25 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>チャット | 論文制作ページ</title>
-
-  <!-- style + main を確実に読み込む（キャッシュ対策乱数付き） -->
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const v = Math.floor(Math.random() * 1000000) + 1;
-      const css = document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = `style.css?v=${v}`;
-      document.head.appendChild(css);
-
-      // main.js はモジュール（Firebase import を使うため）
-      const js = document.createElement("script");
-      js.type = "module";
-      js.src = `main.js?v=${v}`;
-      document.body.appendChild(js);
-      console.log("loaded version:", v);
-    });
-  </script>
-
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- 上部固定ヘッダー -->
@@ -31,7 +13,7 @@
     <h1>チャット</h1>
   </header>
 
-  <!-- メッセージ一覧（ヘッダーと重ならないよう margin-top を CSSで確保） -->
+  <!-- メッセージ一覧 -->
   <main id="chat-container" aria-live="polite"></main>
 
   <!-- 送信帯 -->
@@ -39,27 +21,18 @@
     <button id="file-btn" title="ファイル送信" aria-label="ファイル送信">
       <img src="../imgs/chat/send_file.png" alt="ファイル送信">
     </button>
-
     <textarea id="chat-input" placeholder="メッセージを入力（Shift+Enterで改行）" rows="2" aria-label="メッセージ入力"></textarea>
-
     <button id="send-btn" title="送信" aria-label="送信">
       <img src="../imgs/chat/send.png" alt="送信">
     </button>
   </div>
 
-  <!-- 動画再生用フルスクリーンモーダル -->
+  <!-- 動画モーダル -->
   <div id="video-modal" class="video-modal" aria-hidden="true">
     <video id="video-player" controls></video>
     <button id="video-close" class="video-close" aria-label="閉じる">✕</button>
   </div>
-  <script type="module">
-    // 0〜999999 のランダム値生成
-    const vRand = Math.floor(Math.random() * 1000000);
-    const script = document.createElement("script");
-    script.type = "module";
-    script.src = `./main.js?v=${vRand}`; // ランダム値付き
-    document.body.appendChild(script);
-  </script>
 
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
