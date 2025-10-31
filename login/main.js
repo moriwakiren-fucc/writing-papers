@@ -1,10 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { firebaseConfig } from "./firevase-config.js?v=21";
+import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
