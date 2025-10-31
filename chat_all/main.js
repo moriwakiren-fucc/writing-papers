@@ -182,4 +182,3 @@ fileBtn.addEventListener("click", () => {
   };
   input.click();
 });
-frty ck de3 
