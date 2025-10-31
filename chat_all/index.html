@@ -22,14 +22,14 @@
   
       console.log("version:", version);
 
+    });
+
       // fetchをフックして通信URLを表示
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
         console.log("🔗 Fetch:", args[0]);
         return originalFetch(...args);
       };
-
-    });
   </script>
 
 
