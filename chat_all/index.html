@@ -32,7 +32,7 @@
 <body>
   <script>
     const debugBox = document.createElement("div");
-    debugBox.style.cssText = "position:fixed;top:0;left:0;width:100%;background:#000;color:#0f0;font-family:monospace;max-height:150px;overflow:auto;z-index:9999;";
+    debugBox.style.cssText = "position:fixed;top:0;left:0;width:100%;background:#000;color:#0f0;font-family:monospace;overflow:auto;z-index:9999;";
     document.body.appendChild(debugBox);
 
     console.log = (...args) => {
