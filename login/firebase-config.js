@@ -3,8 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/fireba
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+// login/firebase-config.js
+export const firebaseConfig = {
   apiKey: "AIzaSyB64DJKPuX8MOhqV4fEBl6jwl1B5PjleRQ",
   authDomain: "writing-papers.firebaseapp.com",
   databaseURL: "https://writing-papers-default-rtdb.firebaseio.com",
