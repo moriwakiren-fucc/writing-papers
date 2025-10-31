@@ -1,7 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-import { firebaseConfig } from "./firebase-config.js?v=33";
+// 0〜999999の乱数を生成してキャッシュバスターに使用
+const randomVersion = Math.floor(Math.random() * 1000000);
+import { firebaseConfig } from `./firebase-config.js?v=${randomVersion}`;
+
 
 // Firebase初期化
 const app = initializeApp(firebaseConfig);
