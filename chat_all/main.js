@@ -19,9 +19,13 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/f
 --------------------------*/
 let currentUser = null; // { email, uid, name }
 const members = [
-  { email: "me@example.com", name: "私" },
-  { email: "user1@example.com", name: "山田" },
-  { email: "user2@example.com", name: "佐藤" }
+  {email: "moriwaki@ren.ronbun", name: "森脇 廉"},
+  {email: "muraya@kaho.ronbun", name: "村谷 佳穂"},
+  {email: "kojo@yuina.ronbun", name: "小城 結菜"},
+  {email: "nakano@aiko.ronbun", name: "中野 愛子"},
+  {email: "kamimoto@yuta.ronbun", name: "神元 佑太"},
+  {email: "sadahira@koto.ronbun", name: "定平 琴"},
+  {email: "sunada@suzu.ronbun", name: "砂田 紗々"}
 ];
 
 // DOM 要素
