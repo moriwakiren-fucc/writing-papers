@@ -30,27 +30,59 @@
 </head>
   
 <body>
-  <script>
-    const debugBox = document.createElement("div");
-    debugBox.style.cssText = "position:fixed;top:0;left:0;width:100%;background:#000;color:#0f0;font-family:monospace;overflow:auto;z-index:9999;";
-    document.body.appendChild(debugBox);
+<script>
+/* -----------------------------
+   🔍 簡易 Network モニター
+   （fetch通信を監視）
+------------------------------ */
 
-    console.log = (...args) => {
-      const msg = document.createElement("div");
-      msg.textContent = args.join(" ");
-      debugBox.appendChild(msg);
-    };
-    
-      // fetchをフックして通信URLを表示
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        console.log("🔗 Fetch:", args[0]);
-        return originalFetch(...args);
-      };
+// モニター領域を作成
+const netBox = document.createElement("div");
+netBox.style.cssText = `
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.85);
+  color: #00ff99;
+  font-family: monospace;
+  font-size: 13px;
+  padding: 5px 10px;
+  z-index: 99999;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+`;
+netBox.innerHTML = "🛰 <b>Network Monitor</b><br>";
+document.body.appendChild(netBox);
 
-    console.log("デバッグモードON");
-  </script> 
-  
+// fetchをフックして通信ログを表示
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+  const url = args[0];
+  const method = (args[1]?.method || "GET").toUpperCase();
+  const time = new Date().toLocaleTimeString();
+
+  const logLine = document.createElement("div");
+  logLine.textContent = `[${time}] ${method} → ${url}`;
+  netBox.appendChild(logLine);
+  netBox.scrollTop = netBox.scrollHeight;
+
+  // 通信を実行（エラーでもそのまま返す）
+  try {
+    const response = await originalFetch(...args);
+    return response;
+  } catch (e) {
+    const errLine = document.createElement("div");
+    errLine.style.color = "#ff5555";
+    errLine.textContent = `✗ ${method} ${url} （通信失敗）`;
+    netBox.appendChild(errLine);
+    return Promise.reject(e);
+  }
+};
+</script>
+
   <header>
     <h2><a href="../">《</a></h2><h1>チャット</h1>
   </header>
