@@ -4,20 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ログイン | 論文制作ページ</title>
-  <link rel="stylesheet" href="./style.css">
     <!-- style + main を確実に読み込む（キャッシュ対策乱数付き） -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       const v = Math.floor(Math.random() * 1000000) + 1;
       const css = document.createElement("link");
       css.rel = "stylesheet";
-      css.href = `style.css?v=${v}`;
+      css.href = `./style.css?v=${v}`;
       document.head.appendChild(css);
 
       // main.js はモジュール（Firebase import を使うため）
       const js = document.createElement("script");
       js.type = "module";
-      js.src = `main.js?v=${v}`;
+      js.src = `./main.js?v=${v}`;
       document.body.appendChild(js);
       console.log("loaded version:", v);
     });
