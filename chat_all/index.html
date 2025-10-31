@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>チャット | 論文制作ページ</title>
-  <!-- 🔹 CSS + JSを確実に読み込む -->
+
+  <!-- style + main を確実に読み込む（キャッシュ対策乱数付き） -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      const version = Math.floor(Math.random() * 1000000) + 1;
-
-      // CSS
+      const v = Math.floor(Math.random() * 1000000) + 1;
       const css = document.createElement("link");
       css.rel = "stylesheet";
-      css.href = `style.css?v=${version}`;
+      css.href = `style.css?v=${v}`;
       document.head.appendChild(css);
 
-      // JS（モジュール対応で確実に実行）
+      // main.js はモジュール（Firebase import を使うため）
       const js = document.createElement("script");
       js.type = "module";
-      js.src = `main.js?v=${version}`;
+      js.src = `main.js?v=${v}`;
       document.body.appendChild(js);
-
-      console.log("version:", version);
+      console.log("loaded version:", v);
     });
   </script>
-</head>
 
+</head>
 <body>
+  <!-- 上部固定ヘッダー -->
   <header>
-    <h2><a href="../">《</a></h2><h1>チャット</h1>
+    <h2><a href="../">《</a></h2>
+    <h1>チャット</h1>
   </header>
 
-  <main id="chat-container">
-    <!-- 各投稿はJSで生成 -->
-  </main>
+  <!-- メッセージ一覧（ヘッダーと重ならないよう margin-top を CSSで確保） -->
+  <main id="chat-container" aria-live="polite"></main>
 
   <!-- 送信帯 -->
-  <div class="chat-input-area">
-    <button id="file-btn">
+  <div class="chat-input-area" role="region" aria-label="メッセージ入力">
+    <button id="file-btn" title="ファイル送信" aria-label="ファイル送信">
       <img src="../imgs/chat/send_file.png" alt="ファイル送信">
     </button>
-    <textarea id="chat-input" placeholder="メッセージを入力..." rows="2"></textarea>
-    <button id="send-btn">
+
+    <textarea id="chat-input" placeholder="メッセージを入力（Shift+Enterで改行）" rows="2" aria-label="メッセージ入力"></textarea>
+
+    <button id="send-btn" title="送信" aria-label="送信">
       <img src="../imgs/chat/send.png" alt="送信">
     </button>
+  </div>
+
+  <!-- 動画再生用フルスクリーンモーダル -->
+  <div id="video-modal" class="video-modal" aria-hidden="true">
+    <video id="video-player" controls></video>
+    <button id="video-close" class="video-close" aria-label="閉じる">✕</button>
   </div>
 </body>
 </html>
