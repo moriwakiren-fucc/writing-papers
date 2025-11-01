@@ -1,6 +1,6 @@
 // main.js — Firebase v11対応・完全安定版
 
-import { db, auth } from "../login/firebase-config.js?v=" + Math.floor(Math.random() * 1000000);
+import { db, auth } from "../login/firebase-config.js";
 import {
   ref,
   push,
