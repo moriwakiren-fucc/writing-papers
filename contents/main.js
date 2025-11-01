@@ -3,7 +3,7 @@
 // 🔹 Firebaseモジュールを読み込み
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { firebaseConfig } from "./login/firebase-config.js";
+import { firebaseConfig } from "../login/firebase-config.js";
 
 // Firebase 初期化
 const app = initializeApp(firebaseConfig);
@@ -13,7 +13,7 @@ const auth = getAuth(app);
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     // 未ログイン → ./login/ にリダイレクト
-    window.location.href = "./login/index.html?v=" + Math.floor(Math.random() * 1000000);
+    window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
   } else {
     console.log("ログイン中:", user.email);
     initPage(); // ページ機能を初期化
@@ -62,7 +62,7 @@ function initPage() {
       signOut(auth)
         .then(() => {
           // ログアウト完了 → loginページへ
-          window.location.href = "./login/index.html?v=" + Math.floor(Math.random() * 1000000);
+          window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
         })
         .catch((error) => {
           alert("ログアウトエラー: " + error.message);
