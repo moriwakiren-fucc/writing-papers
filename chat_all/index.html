@@ -5,42 +5,30 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>チャット | 論文制作ページ</title>
 
-  <!-- CSS + JSを乱数付きで確実に再読み込み -->
+  <!-- CSS（キャッシュ対策付き） -->
+  <link rel="stylesheet" id="main-style">
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const v = Math.floor(Math.random() * 1000000);
-      const css = document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = `style.css?v=${v}`;
-      document.head.appendChild(css);
-
-      const js = document.createElement("script");
-      js.type = "module";
-      js.src = `main.js?v=${v}`;
-      document.body.appendChild(js);
-    });
+    const v = Math.floor(Math.random() * 1000000);
+    document.getElementById("main-style").href = `style.css?v=${v}`;
   </script>
 </head>
 
 <body>
-  <!-- ヘッダー -->
   <header>
     <h2><a href="../">《</a></h2>
     <h1>チャット</h1>
   </header>
 
-  <!-- チャット表示 -->
   <main id="chat-container"></main>
 
-  <!-- 入力エリア -->
   <div class="chat-input-area">
-    <textarea
-      id="chat-input"
-      placeholder="メッセージを入力（Ctrl+Enterで送信、Enterで改行）"
-      rows="2"></textarea>
-    <button id="send-btn" title="送信" aria-label="送信">
+    <textarea id="chat-input" placeholder="メッセージを入力（Ctrl+Enterで送信、Enterで改行）"></textarea>
+    <button id="send-btn" title="送信">
       <img src="../imgs/chat/send.png" alt="送信">
     </button>
   </div>
+
+  <!-- ✅ main.js をここで読み込む（DOM構築後） -->
+  <script type="module" src="main.js?v=2345698"></script>
 </body>
 </html>
