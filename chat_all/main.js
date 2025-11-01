@@ -1,4 +1,4 @@
-// main.js — Firebase v11対応・完全安定版（送信バグ修正済）
+// main.js — Firebase v11対応・送信確実動作版
 
 import { db, auth } from "../login/firebase-config.js?v=" + Math.floor(Math.random() * 1000000);
 import {
@@ -21,7 +21,7 @@ function statusBox(text) {
       position: "fixed",
       top: "8px",
       right: "8px",
-      background: "rgba(0,0,0,0.7)",
+      background: "rgba(0,0,0,0.8)",
       color: "#fff",
       fontSize: "12px",
       padding: "8px",
@@ -113,6 +113,7 @@ function initChat() {
     })
     .catch(err => {
       statusBox(["履歴取得エラー", err.message || err]);
+      alert("履歴取得エラー: " + err.message);
     });
 
   // リアルタイム監視
@@ -127,6 +128,7 @@ function initChat() {
 function sendMessage(text) {
   if (!currentUser) {
     statusBox(["送信不可：未ログイン"]);
+    alert("送信不可：未ログイン");
     return;
   }
   const trimmed = text.trim();
@@ -136,6 +138,7 @@ function sendMessage(text) {
   const hh = now.getHours().toString().padStart(2, "0");
   const mm = now.getMinutes().toString().padStart(2, "0");
 
+  const msgRef = ref(db, "chat_messages");
   const msg = {
     senderEmail: currentUser.email,
     senderName: currentUser.name,
@@ -145,7 +148,6 @@ function sendMessage(text) {
     timeValue: now.getTime()
   };
 
-  const msgRef = ref(db, "chat_messages");
   push(msgRef, msg)
     .then(() => {
       chatInput.value = "";
@@ -153,22 +155,29 @@ function sendMessage(text) {
     })
     .catch(err => {
       statusBox(["送信失敗", err.message || err]);
+      alert("送信失敗: " + err.message);
     });
 }
 
 /* ---------- 認証 ---------- */
 onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
-    return;
+  try {
+    if (!user) {
+      alert("未ログイン。ログインページへ移動します。");
+      window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
+      return;
+    }
+    currentUser = {
+      email: user.email,
+      uid: user.uid,
+      name: user.displayName || user.email
+    };
+    statusBox(["認証OK", `user: ${user.email}`]);
+    initChat();
+  } catch (err) {
+    alert("認証エラー: " + err.message);
+    statusBox(["認証エラー", err.message || err]);
   }
-  currentUser = {
-    email: user.email,
-    uid: user.uid,
-    name: user.displayName || user.email
-  };
-  statusBox(["認証OK", `user: ${user.email}`]);
-  initChat();
 });
 
 /* ---------- イベント ---------- */
