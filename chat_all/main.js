@@ -1,135 +1,114 @@
-// main.js（動作保証版）
-import { db, auth } from "../login/firebase-config.js";
-import {
-  ref,
-  push,
-  onChildAdded,
-  get,
-  query,
-  orderByChild
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+/* style.css */
 
-let currentUser = null;
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: "Noto Sans JP", sans-serif; }
+body { display: flex; flex-direction: column; background: #9cb2d9; }
 
-// ✅ DOM読み込み後に実行
-window.addEventListener("DOMContentLoaded", () => {
-  const chatContainer = document.getElementById("chat-container");
-  const chatInput = document.getElementById("chat-input");
-  const sendBtn = document.getElementById("send-btn");
+/* ヘッダー */
+header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3rem; background: #fff; border-bottom: 1px solid #444;
+  display: flex; align-items: center; gap: .75rem; padding: 0 .75rem; z-index: 10;
+}
+header h2 { margin: 0; font-size: 1.6rem; }
+header h2 a { text-decoration: none; color: #000; }
+header h1 { margin: 0; font-size: 1.3rem; flex: 1; text-align: center; }
 
-  if (!chatContainer || !chatInput || !sendBtn) {
-    alert("必要な要素が見つかりません（HTMLのidを確認してください）");
-    return;
-  }
+/* チャットコンテナ */
+#chat-container {
+  margin-top: 3.5rem;
+  margin-bottom: 4rem;
+  padding: 0.75rem;
+  overflow-y: auto;
+  flex: 1;
+}
 
-  const members = [
-    { email: "moriwaki@ren.ronbun", name: "森脇 廉" },
-    { email: "muraya@kaho.ronbun", name: "村谷 佳穂" },
-    { email: "kojo@yuina.ronbun", name: "小城 結菜" },
-    { email: "nakano@aiko.ronbun", name: "中野 愛子" },
-    { email: "kamimoto@yuta.ronbun", name: "神元 佑太" },
-    { email: "sadahira@koto.ronbun", name: "定平 琴" },
-    { email: "sunada@suzu.ronbun", name: "砂田 紗々" }
-  ];
+/* 日付区切り */
+.date-divider {
+  text-align: center;
+  color: #333;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
 
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "../login/index.html";
-      return;
-    }
+/* メッセージ配置 */
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 0.4rem 0;
+}
 
-    const member = members.find(m => m.email === user.email);
-    currentUser = {
-      email: user.email,
-      uid: user.uid,
-      name: member ? member.name : user.email
-    };
-    initChat();
-  });
+/* 自分（右寄せ） */
+.message-wrapper.mine {
+  align-items: flex-end;
+}
 
-  // ✅ メッセージ送信
-  function sendMessage(text) {
-    if (!currentUser) return;
-    const trimmed = text.trim();
-    if (!trimmed) return;
+/* 他人（左寄せ） */
+.message-wrapper.theirs {
+  align-items: flex-start;
+}
 
-    const now = new Date();
-    const hh = now.getHours().toString().padStart(2, "0");
-    const mm = now.getMinutes().toString().padStart(2, "0");
-    const date = now.toLocaleDateString("ja-JP");
+/* 吹き出し */
+.chat-bubble {
+  max-width: 70%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  word-break: break-word;
+}
+.chat-bubble.right {
+  background: #98e887;
+  border: 1px solid #77c766;
+}
+.chat-bubble.left {
+  background: #fff;
+  border: 1px solid #ddd;
+}
 
-    const messageRef = ref(db, "chat_messages");
-    push(messageRef, {
-      senderEmail: currentUser.email,
-      senderName: currentUser.name,
-      text: trimmed,
-      timestamp: `${hh}:${mm}`,
-      date,
-      timeValue: now.getTime()
-    });
-    chatInput.value = "";
-  }
+/* 送信者名（相手のみ） */
+.sender {
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+  color: #222;
+}
 
-  // ✅ DOM描画
-  function addMessageToDOM(msg) {
-    const isMine = msg.senderEmail === currentUser.email;
-    const dateId = `date-${msg.date.replace(/\//g, "-")}`;
-    if (!document.getElementById(dateId)) {
-      const div = document.createElement("div");
-      div.id = dateId;
-      div.className = "date-divider";
-      div.textContent = `--- ${msg.date} ---`;
-      chatContainer.appendChild(div);
-    }
+/* 時刻 */
+.msg-time {
+  font-size: 0.7rem;
+  margin-top: 0.1rem;
+  opacity: 0.8;
+}
+.mine-time {
+  align-self: flex-end;
+  margin-right: 4px;
+}
+.theirs-time {
+  align-self: flex-start;
+  margin-left: 4px;
+}
 
-    const wrapper = document.createElement("div");
-    wrapper.className = `message-wrapper ${isMine ? "mine" : "theirs"}`;
-
-    if (!isMine) {
-      const sender = document.createElement("div");
-      sender.className = "sender";
-      sender.textContent = msg.senderName || msg.senderEmail;
-      wrapper.appendChild(sender);
-    }
-
-    const bubble = document.createElement("div");
-    bubble.className = `chat-bubble ${isMine ? "right" : "left"}`;
-    bubble.textContent = msg.text;
-    wrapper.appendChild(bubble);
-
-    const time = document.createElement("div");
-    time.className = `msg-time ${isMine ? "mine-time" : "theirs-time"}`;
-    time.textContent = msg.timestamp || "";
-    wrapper.appendChild(time);
-
-    chatContainer.appendChild(wrapper);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
-
-  // ✅ 初期ロード
-  function initChat() {
-    const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
-    get(messagesRef).then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.values(data).forEach(d => addMessageToDOM(d));
-      }
-    });
-
-    onChildAdded(ref(db, "chat_messages"), snap => {
-      addMessageToDOM(snap.val());
-    });
-  }
-
-  // ✅ 送信ボタン
-  sendBtn.addEventListener("click", () => sendMessage(chatInput.value));
-
-  // ✅ Ctrl+Enter or Cmd+Enter で送信
-  chatInput.addEventListener("keydown", e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      e.preventDefault();
-      sendMessage(chatInput.value);
-    }
-  });
-});
+/* 入力帯 */
+.chat-input-area {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; gap: .5rem; align-items: center;
+  padding: .5rem; background: #fff; border-top: 1px solid #ccc;
+}
+#chat-input {
+  flex: 1;
+  resize: none;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-height: 2.2rem;
+}
+#send-btn {
+  border: none;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 8px;
+  padding: .4rem .8rem;
+  cursor: pointer;
+}
+#send-btn:hover {
+  background: #3a9e42;
+}
