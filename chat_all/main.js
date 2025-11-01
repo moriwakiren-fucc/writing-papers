@@ -1,5 +1,5 @@
-// main.js（最終安定版）
-// console.log 一切なし・送信イベント確実発火版
+// main.js（確実動作版・console.logなし）
+// 送信イベント確実発火＋レイアウト維持
 
 import { db, auth } from "../login/firebase-config.js";
 import {
@@ -12,32 +12,25 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-/* -------------------------
-   メンバー一覧
---------------------------*/
-const members = [
-  { email: "moriwaki@ren.ronbun", name: "森脇 廉" },
-  { email: "muraya@kaho.ronbun", name: "村谷 佳穂" },
-  { email: "kojo@yuina.ronbun", name: "小城 結菜" },
-  { email: "nakano@aiko.ronbun", name: "中野 愛子" },
-  { email: "kamimoto@yuta.ronbun", name: "神元 佑太" },
-  { email: "sadahira@koto.ronbun", name: "定平 琴" },
-  { email: "sunada@suzu.ronbun", name: "砂田 紗々" }
-];
-
-let currentUser = null;
-
-/* -------------------------
-   DOM 構築後に初期化
---------------------------*/
-window.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
   const chatContainer = document.getElementById("chat-container");
   const chatInput = document.getElementById("chat-input");
   const sendBtn = document.getElementById("send-btn");
 
   if (!chatContainer || !chatInput || !sendBtn) return;
 
-  // 認証確認
+  let currentUser = null;
+
+  const members = [
+    { email: "moriwaki@ren.ronbun", name: "森脇 廉" },
+    { email: "muraya@kaho.ronbun", name: "村谷 佳穂" },
+    { email: "kojo@yuina.ronbun", name: "小城 結菜" },
+    { email: "nakano@aiko.ronbun", name: "中野 愛子" },
+    { email: "kamimoto@yuta.ronbun", name: "神元 佑太" },
+    { email: "sadahira@koto.ronbun", name: "定平 琴" },
+    { email: "sunada@suzu.ronbun", name: "砂田 紗々" }
+  ];
+
   onAuthStateChanged(auth, user => {
     if (!user) {
       window.location.href = "../login/index.html";
@@ -50,15 +43,11 @@ window.addEventListener("DOMContentLoaded", () => {
       uid: user.uid,
       name: member ? member.name : user.email
     };
-
     initChat();
   });
 
-  /* -------------------------
-     メッセージ送信
-  --------------------------*/
   function sendMessage(text) {
-    if (!currentUser) return; // 未ログイン時ブロック
+    if (!currentUser) return;
     const trimmed = text.trim();
     if (!trimmed) return;
 
@@ -80,9 +69,6 @@ window.addEventListener("DOMContentLoaded", () => {
     chatInput.value = "";
   }
 
-  /* -------------------------
-     チャット描画
-  --------------------------*/
   function addMessageToDOM(msg) {
     if (!msg || !msg.timestamp) return;
     const isMine = msg.senderEmail === currentUser.email;
@@ -110,6 +96,7 @@ window.addEventListener("DOMContentLoaded", () => {
     bubble.className = `chat-bubble ${isMine ? "right" : "left"}`;
     const textDiv = document.createElement("div");
     textDiv.className = "bubble-text";
+
     let safe = escapeHtml(msg.text || "");
     safe = safe
       .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
@@ -136,9 +123,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }[c]));
   }
 
-  /* -------------------------
-     チャット初期化
-  --------------------------*/
   let initialized = false;
   function initChat() {
     if (initialized) return;
@@ -158,18 +142,12 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* -------------------------
-     イベント登録
-  --------------------------*/
-  sendBtn.addEventListener("click", () => {
-    sendMessage(chatInput.value);
-  });
+  sendBtn.onclick = () => sendMessage(chatInput.value);
 
-  chatInput.addEventListener("keydown", e => {
-    // Ctrl+Enter または Cmd+Enter で送信
+  chatInput.onkeydown = e => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       sendMessage(chatInput.value);
     }
-  });
-});
+  };
+};
