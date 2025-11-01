@@ -4,7 +4,7 @@ html, body {
   height: 100%;
   margin: 0;
   font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
-  background: #dce6f5;
+  background: #e6eef9;
   display: flex;
   flex-direction: column;
 }
@@ -17,11 +17,11 @@ header {
   right: 0;
   height: 3.2rem;
   background: #fff;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid #cfcfcf;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 20;
 }
 header h2 {
   position: absolute;
@@ -35,14 +35,14 @@ header h2 a {
 }
 header h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
-/* チャット本体 */
+/* チャットエリア */
 #chat-container {
   flex: 1;
   overflow-y: auto;
-  padding: 4.2rem 0.8rem 4.4rem;
+  padding: 4.4rem 0.8rem 4.8rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -51,9 +51,9 @@ header h1 {
 /* 日付区切り */
 .date-divider {
   text-align: center;
-  color: #444;
+  color: #555;
   font-size: 0.85rem;
-  opacity: 0.8;
+  opacity: 0.85;
   margin: 0.5rem 0;
 }
 
@@ -61,7 +61,7 @@ header h1 {
 .message-wrapper {
   display: flex;
   flex-direction: column;
-  max-width: 80%;
+  max-width: 82%;
   word-break: break-word;
 }
 
@@ -84,30 +84,31 @@ header h1 {
   display: inline-block;
   white-space: pre-wrap;
   line-height: 1.5;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
 }
 .chat-bubble.right {
-  background: #b9f7b4;
+  background: #c9f0c9;
 }
 .chat-bubble.left {
-  background: #fff;
+  background: #ffffff;
 }
 
-/* 送信者名 */
+/* 送信者名（0.5em相当の見た目に近づける調整） */
 .sender {
   font-size: 0.75em;
   color: #333;
   margin-bottom: 0.25em;
 }
 
-/* 時刻 */
+/* 時刻（0.5em見た目） */
 .msg-time {
-  font-size: 0.7em;
-  color: #555;
-  opacity: 0.8;
-  margin-top: 0.3em;
+  font-size: 0.75em;
+  color: #444;
+  opacity: 0.85;
+  margin-top: 0.28em;
 }
 
-/* 自分は左下・他人は右下 */
+/* 配置：自分は左下、他人は右下 */
 .mine-time {
   align-self: flex-start;
   margin-left: 0.5em;
@@ -117,7 +118,7 @@ header h1 {
   margin-right: 0.5em;
 }
 
-/* リンクやコード */
+/* リンク・コード見た目 */
 .chat-bubble a {
   color: #0645ad;
   text-decoration: underline;
@@ -135,27 +136,29 @@ header h1 {
   left: 0;
   right: 0;
   background: #fff;
-  border-top: 1px solid #aaa;
+  border-top: 1px solid #cfcfcf;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.5rem;
   padding: 0.6rem;
+  z-index: 30;
 }
 .chat-input-area textarea {
   flex: 1;
   resize: none;
   min-height: 2.5rem;
-  max-height: 6rem;
+  max-height: 8rem;
   padding: 0.6rem;
-  border: 1px solid #ccc;
+  border: 1px solid #d0d0d0;
   border-radius: 8px;
-  background: #f7f7f7;
+  background: #fafafa;
+  font-size: 0.95rem;
 }
 .chat-input-area button {
   border: none;
   background: transparent;
   cursor: pointer;
-  padding: 0.3rem;
+  padding: 0.2rem;
 }
 .chat-input-area button img {
   width: 1.8rem;
