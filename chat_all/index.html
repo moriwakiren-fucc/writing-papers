@@ -33,12 +33,10 @@
   </div>
 
   <!-- main.jsをランダムパラメータ付きで読み込み -->
-  <script>
-    const vMain = Math.floor(Math.random() * 1000000);
-    const script = document.createElement("script");
-    script.type = "module";
-    script.src = `main.js?v=${vMain}`;
-    document.body.appendChild(script);
-  </script>
+<script type="module">
+  const rand = Math.floor(Math.random() * 1000000);
+  import(`./main.js?v=${rand}`);
+</script>
+
 </body>
 </html>
