@@ -1,166 +1,114 @@
-/* ========== 全体レイアウト ========== */
+/* style.css */
+
 * { box-sizing: border-box; }
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
-  background: #e6eef9;
-  display: flex;
-  flex-direction: column;
-}
+html, body { margin: 0; height: 100%; font-family: "Noto Sans JP", sans-serif; }
+body { display: flex; flex-direction: column; background: #9cb2d9; }
 
 /* ヘッダー */
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3.2rem;
-  background: #fff;
-  border-bottom: 1px solid #cfcfcf;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3rem; background: #fff; border-bottom: 1px solid #444;
+  display: flex; align-items: center; gap: .75rem; padding: 0 .75rem; z-index: 10;
 }
-header h2 {
-  position: absolute;
-  left: 1rem;
-  margin: 0;
-  font-size: 1.5rem;
-}
-header h2 a {
-  color: #333;
-  text-decoration: none;
-}
-header h1 {
-  margin: 0;
-  font-size: 1.2rem;
-}
+header h2 { margin: 0; font-size: 1.6rem; }
+header h2 a { text-decoration: none; color: #000; }
+header h1 { margin: 0; font-size: 1.3rem; flex: 1; text-align: center; }
 
-/* チャットエリア */
+/* チャットコンテナ */
 #chat-container {
-  flex: 1;
+  margin-top: 3.5rem;
+  margin-bottom: 4rem;
+  padding: 0.75rem;
   overflow-y: auto;
-  padding: 4.4rem 0.8rem 4.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  flex: 1;
 }
 
 /* 日付区切り */
 .date-divider {
   text-align: center;
-  color: #555;
-  font-size: 0.85rem;
-  opacity: 0.85;
+  color: #333;
   margin: 0.5rem 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
-/* メッセージラッパー */
+/* メッセージ配置 */
 .message-wrapper {
   display: flex;
   flex-direction: column;
-  max-width: 82%;
-  word-break: break-word;
+  margin: 0.4rem 0;
 }
 
-/* 自分のメッセージ（右寄せ） */
+/* 自分（右寄せ） */
 .message-wrapper.mine {
-  align-self: flex-end;
-  text-align: right;
+  align-items: flex-end;
 }
 
-/* 他人のメッセージ（左寄せ） */
+/* 他人（左寄せ） */
 .message-wrapper.theirs {
-  align-self: flex-start;
-  text-align: left;
+  align-items: flex-start;
 }
 
 /* 吹き出し */
 .chat-bubble {
+  max-width: 70%;
+  padding: 0.6rem 0.8rem;
   border-radius: 12px;
-  padding: 10px 12px;
-  display: inline-block;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  word-break: break-word;
 }
 .chat-bubble.right {
-  background: #c9f0c9;
+  background: #98e887;
+  border: 1px solid #77c766;
 }
 .chat-bubble.left {
-  background: #ffffff;
+  background: #fff;
+  border: 1px solid #ddd;
 }
 
-/* 送信者名（0.5em相当の見た目に近づける調整） */
+/* 送信者名（相手のみ） */
 .sender {
-  font-size: 0.75em;
-  color: #333;
-  margin-bottom: 0.25em;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+  color: #222;
 }
 
-/* 時刻（0.5em見た目） */
+/* 時刻 */
 .msg-time {
-  font-size: 0.75em;
-  color: #444;
-  opacity: 0.85;
-  margin-top: 0.28em;
+  font-size: 0.7rem;
+  margin-top: 0.1rem;
+  opacity: 0.8;
 }
-
-/* 配置：自分は左下、他人は右下 */
 .mine-time {
-  align-self: flex-start;
-  margin-left: 0.5em;
+  align-self: flex-end;
+  margin-right: 4px;
 }
 .theirs-time {
-  align-self: flex-end;
-  margin-right: 0.5em;
-}
-
-/* リンク・コード見た目 */
-.chat-bubble a {
-  color: #0645ad;
-  text-decoration: underline;
-}
-.chat-bubble code {
-  background: #f5f5f5;
-  border-radius: 3px;
-  padding: 2px 4px;
+  align-self: flex-start;
+  margin-left: 4px;
 }
 
 /* 入力帯 */
 .chat-input-area {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #cfcfcf;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem;
-  z-index: 30;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; gap: .5rem; align-items: center;
+  padding: .5rem; background: #fff; border-top: 1px solid #ccc;
 }
-.chat-input-area textarea {
+#chat-input {
   flex: 1;
   resize: none;
-  min-height: 2.5rem;
-  max-height: 8rem;
-  padding: 0.6rem;
-  border: 1px solid #d0d0d0;
-  border-radius: 8px;
-  background: #fafafa;
-  font-size: 0.95rem;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-height: 2.2rem;
 }
-.chat-input-area button {
+#send-btn {
   border: none;
-  background: transparent;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 8px;
+  padding: .4rem .8rem;
   cursor: pointer;
-  padding: 0.2rem;
 }
-.chat-input-area button img {
-  width: 1.8rem;
-  height: 1.8rem;
+#send-btn:hover {
+  background: #3a9e42;
 }
