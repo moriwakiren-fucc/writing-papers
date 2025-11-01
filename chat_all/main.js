@@ -1,4 +1,4 @@
-// main.js — Firebase v11 完全安定版（履歴・送信とも正常動作）
+// main.js — Firebase v11 完全安定版（履歴＋送信）
 
 import { db, auth } from "../login/firebase-config.js";
 import {
@@ -6,13 +6,12 @@ import {
   push,
   onChildAdded,
   get,
-  query,
-  orderByChild
+  child
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 /* -------------------------
-   HTMLエスケープ関数
+   HTMLエスケープ
 --------------------------*/
 function escapeHtml(s) {
   if (!s) return "";
@@ -22,13 +21,13 @@ function escapeHtml(s) {
 }
 
 /* -------------------------
-   メッセージをDOMに追加
+   メッセージ描画
 --------------------------*/
 function addMessageToDOM(msg, currentUserEmail, chatContainer) {
   const isMine = msg.senderEmail === currentUserEmail;
-
-  // 日付区切りを追加（なければ）
   const dateId = `date-${msg.date.replace(/\//g, "-")}`;
+
+  // 日付区切りを追加
   if (!document.getElementById(dateId)) {
     const divider = document.createElement("div");
     divider.id = dateId;
@@ -40,7 +39,7 @@ function addMessageToDOM(msg, currentUserEmail, chatContainer) {
   const wrapper = document.createElement("div");
   wrapper.className = `message-wrapper ${isMine ? "mine" : "theirs"}`;
 
-  // 他人のメッセージには送信者名
+  // 他人メッセージには送信者名
   if (!isMine) {
     const sender = document.createElement("div");
     sender.className = "sender";
@@ -48,14 +47,16 @@ function addMessageToDOM(msg, currentUserEmail, chatContainer) {
     wrapper.appendChild(sender);
   }
 
+  // 吹き出し
   const bubble = document.createElement("div");
   bubble.className = `chat-bubble ${isMine ? "right" : "left"}`;
-  bubble.innerHTML = escapeHtml(msg.text);
+  bubble.innerHTML = escapeHtml(msg.text || "");
   wrapper.appendChild(bubble);
 
+  // 時刻
   const time = document.createElement("div");
   time.className = `msg-time ${isMine ? "mine-time" : "theirs-time"}`;
-  time.textContent = msg.timestamp;
+  time.textContent = msg.timestamp || "";
   wrapper.appendChild(time);
 
   chatContainer.appendChild(wrapper);
@@ -66,30 +67,26 @@ function addMessageToDOM(msg, currentUserEmail, chatContainer) {
    チャット初期化
 --------------------------*/
 async function initChat(currentUser, chatContainer) {
-  const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
-  const loadedKeys = new Set();
-
   try {
-    const snapshot = await get(messagesRef);
+    const snapshot = await get(child(ref(db), "chat_messages"));
     if (snapshot.exists()) {
       const data = snapshot.val();
-      Object.entries(data).forEach(([key, d]) => {
-        loadedKeys.add(key);
+      // timeValueで並べ替え
+      const messages = Object.values(data).sort((a, b) => (a.timeValue || 0) - (b.timeValue || 0));
+      for (const d of messages) {
         addMessageToDOM(d, currentUser.email, chatContainer);
-      });
+      }
+    } else {
+      alert("履歴がまだありません。");
     }
   } catch (err) {
     alert("履歴取得エラー: " + (err.message || err));
   }
 
-  // 新規メッセージのみ追加
+  // 新着をリアルタイム追加
   onChildAdded(ref(db, "chat_messages"), (snap) => {
-    const key = snap.key;
-    if (!loadedKeys.has(key)) {
-      loadedKeys.add(key);
-      const d = snap.val();
-      addMessageToDOM(d, currentUser.email, chatContainer);
-    }
+    const d = snap.val();
+    addMessageToDOM(d, currentUser.email, chatContainer);
   });
 }
 
@@ -115,13 +112,13 @@ function sendMessage(text, currentUser, chatInput) {
     .then(() => {
       chatInput.value = "";
     })
-    .catch((err) => {
+    .catch(err => {
       alert("送信エラー: " + (err.message || err));
     });
 }
 
 /* -------------------------
-   DOM読み込み後に全処理開始
+   DOM構築後に開始
 --------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
   const chatContainer = document.getElementById("chat-container");
@@ -130,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentUser = null;
 
-  // Firebase認証
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       window.location.href = "../login/index.html";
@@ -146,13 +142,11 @@ document.addEventListener("DOMContentLoaded", () => {
     initChat(currentUser, chatContainer);
   });
 
-  // ボタン送信
   sendBtn.addEventListener("click", () => {
     if (!currentUser) return;
     sendMessage(chatInput.value, currentUser, chatInput);
   });
 
-  // Ctrl+Enter / Cmd+Enter送信
   chatInput.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
