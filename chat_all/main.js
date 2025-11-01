@@ -1,4 +1,4 @@
-// main.js — Firebase v11 送信バグ完全修正版
+// main.js — Firebase v11 安定完全版
 import { db, auth } from "../login/firebase-config.js";
 import {
   ref,
@@ -10,15 +10,15 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-/* ---------- 状態表示（デバッグ代替） ---------- */
-function alertBox(msgs) {
+/* ---------- シンプルなデバッグ ---------- */
+function info(msgs) {
   alert(Array.isArray(msgs) ? msgs.join("\n") : msgs);
 }
 
 /* ---------- DOM取得 ---------- */
 let chatContainer, chatInput, sendBtn;
 
-/* ---------- escape ---------- */
+/* ---------- エスケープ ---------- */
 function escapeHtml(s) {
   if (!s) return "";
   return s.replace(/[&<>"']/g, c => ({
@@ -26,10 +26,11 @@ function escapeHtml(s) {
   }[c]));
 }
 
-/* ---------- 表示 ---------- */
+/* ---------- メッセージ描画 ---------- */
 function addMessageToDOM(msg, currentUserEmail) {
   const isMine = msg.senderEmail === currentUserEmail;
-  const dateId = `date-${msg.date.replace(/\//g, "-")}`;
+  const dateKey = msg.date.replace(/\//g, "-");
+  const dateId = `date-${dateKey}`;
 
   if (!document.getElementById(dateId)) {
     const div = document.createElement("div");
@@ -63,44 +64,54 @@ function addMessageToDOM(msg, currentUserEmail) {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-/* ---------- グローバル状態 ---------- */
+/* ---------- 状態 ---------- */
 let currentUser = null;
 let initialized = false;
+const loadedKeys = new Set(); // ✅ 重複防止セット
 
-/* ---------- 初期ロード ---------- */
-function initChat() {
+/* ---------- 初期化 ---------- */
+async function initChat() {
   if (initialized) return;
   initialized = true;
 
   const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
 
-  get(messagesRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.values(data).forEach(d => addMessageToDOM(d, currentUser.email));
-      }
-    })
-    .catch(err => alertBox(["履歴取得エラー", err.message || err]));
+  try {
+    const snapshot = await get(messagesRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      Object.entries(data).forEach(([key, d]) => {
+        loadedKeys.add(key);
+        addMessageToDOM(d, currentUser.email);
+      });
+      info(["履歴取得完了", `user: ${currentUser.email}`]);
+    } else {
+      info(["履歴なし", `user: ${currentUser.email}`]);
+    }
+  } catch (err) {
+    info(["履歴取得エラー", err.message || err]);
+  }
 
+  // ✅ 新規メッセージのみリアルタイム追加
   onChildAdded(ref(db, "chat_messages"), snap => {
-    const d = snap.val();
-    addMessageToDOM(d, currentUser.email);
+    const key = snap.key;
+    if (!loadedKeys.has(key)) {
+      loadedKeys.add(key);
+      const d = snap.val();
+      addMessageToDOM(d, currentUser.email);
+    }
   });
 }
 
-/* ---------- 送信 ---------- */
+/* ---------- メッセージ送信 ---------- */
 function sendMessage(text) {
   if (!currentUser) {
-    alertBox("未ログインのため送信できません");
+    info("未ログインのため送信できません");
     return;
   }
 
   const trimmed = text.trim();
-  if (!trimmed) {
-    alertBox("空メッセージは送信できません");
-    return;
-  }
+  if (!trimmed) return;
 
   const now = new Date();
   const hh = now.getHours().toString().padStart(2, "0");
@@ -119,10 +130,9 @@ function sendMessage(text) {
   push(ref(db, "chat_messages"), msg)
     .then(() => {
       chatInput.value = "";
-      addMessageToDOM(msg, currentUser.email);
     })
     .catch(err => {
-      alertBox(["送信失敗", err.message || err]);
+      info(["送信失敗", err.message || err]);
     });
 }
 
@@ -132,7 +142,6 @@ onAuthStateChanged(auth, user => {
     window.location.href = "../login/index.html";
     return;
   }
-
   currentUser = {
     email: user.email,
     uid: user.uid,
@@ -141,7 +150,7 @@ onAuthStateChanged(auth, user => {
   initChat();
 });
 
-/* ---------- イベント登録 ---------- */
+/* ---------- DOM イベント ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   chatContainer = document.getElementById("chat-container");
   chatInput = document.getElementById("chat-input");
