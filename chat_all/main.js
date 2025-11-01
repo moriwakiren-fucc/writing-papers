@@ -158,3 +158,4 @@ chatInput.addEventListener("keydown", (e) => {
     sendMessage(chatInput.value);
   }
 });
+
