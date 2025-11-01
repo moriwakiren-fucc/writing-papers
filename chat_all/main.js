@@ -1,5 +1,5 @@
 // main.js
-import { db, auth } from "../login/firebase-config.js?v=" + Math.floor(Math.random() * 1000000);
+import { db, auth } from "../login/firebase-config.js";
 import {
   ref,
   push,
@@ -36,7 +36,9 @@ const sendBtn = document.getElementById("send-btn");
 --------------------------*/
 onAuthStateChanged(auth, user => {
   if (!user) {
-    window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
+    // 未ログインならログインページへ
+    const v = Math.floor(Math.random() * 1000000);
+    window.location.href = `../login/index.html?v=${v}`;
     return;
   }
 
@@ -46,6 +48,7 @@ onAuthStateChanged(auth, user => {
     uid: user.uid,
     name: member ? member.name : user.email
   };
+
   initChat();
 });
 
@@ -81,7 +84,6 @@ function sendMessage(text) {
 function addMessageToDOM(msg) {
   const isMine = (msg.senderEmail === currentUser.email);
 
-  // 日付ごとに区切りを作成
   const dateId = `date-${msg.date.replace(/\//g, "-")}`;
   if (!document.getElementById(dateId)) {
     const divider = document.createElement("div");
@@ -91,11 +93,9 @@ function addMessageToDOM(msg) {
     chatContainer.appendChild(divider);
   }
 
-  // 各メッセージのラッパー
   const wrapper = document.createElement("div");
   wrapper.className = `message-wrapper ${isMine ? "mine" : "theirs"}`;
 
-  // 相手のメッセージには送信者名を表示
   if (!isMine) {
     const sender = document.createElement("div");
     sender.className = "sender";
@@ -103,13 +103,11 @@ function addMessageToDOM(msg) {
     wrapper.appendChild(sender);
   }
 
-  // 吹き出し部分
   const bubble = document.createElement("div");
   bubble.className = `chat-bubble ${isMine ? "right" : "left"}`;
   bubble.textContent = msg.text;
   wrapper.appendChild(bubble);
 
-  // 時刻表示（位置はCSSで制御）
   const time = document.createElement("div");
   time.className = `msg-time ${isMine ? "mine-time" : "theirs-time"}`;
   time.textContent = msg.timestamp || "";
@@ -129,7 +127,6 @@ function initChat() {
 
   const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
 
-  // 履歴取得
   get(messagesRef).then(snapshot => {
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -137,7 +134,6 @@ function initChat() {
     }
   });
 
-  // リアルタイム反映
   onChildAdded(ref(db, "chat_messages"), (snap) => {
     const d = snap.val();
     addMessageToDOM(d);
@@ -145,17 +141,15 @@ function initChat() {
 }
 
 /* -------------------------
-   送信ボタン & キー操作
+   送信イベント
 --------------------------*/
 sendBtn.addEventListener("click", () => {
   sendMessage(chatInput.value);
 });
 
-// Ctrl+Enter / Cmd+Enter で送信
 chatInput.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
     e.preventDefault();
     sendMessage(chatInput.value);
   }
 });
-
