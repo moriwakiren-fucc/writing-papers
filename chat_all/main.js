@@ -1,6 +1,4 @@
-// main.js（確実動作版・console.logなし）
-// 送信イベント確実発火＋レイアウト維持
-
+// main.js（動作保証版）
 import { db, auth } from "../login/firebase-config.js";
 import {
   ref,
@@ -12,14 +10,18 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-window.onload = () => {
+let currentUser = null;
+
+// ✅ DOM読み込み後に実行
+window.addEventListener("DOMContentLoaded", () => {
   const chatContainer = document.getElementById("chat-container");
   const chatInput = document.getElementById("chat-input");
   const sendBtn = document.getElementById("send-btn");
 
-  if (!chatContainer || !chatInput || !sendBtn) return;
-
-  let currentUser = null;
+  if (!chatContainer || !chatInput || !sendBtn) {
+    alert("必要な要素が見つかりません（HTMLのidを確認してください）");
+    return;
+  }
 
   const members = [
     { email: "moriwaki@ren.ronbun", name: "森脇 廉" },
@@ -46,6 +48,7 @@ window.onload = () => {
     initChat();
   });
 
+  // ✅ メッセージ送信
   function sendMessage(text) {
     if (!currentUser) return;
     const trimmed = text.trim();
@@ -65,21 +68,19 @@ window.onload = () => {
       date,
       timeValue: now.getTime()
     });
-
     chatInput.value = "";
   }
 
+  // ✅ DOM描画
   function addMessageToDOM(msg) {
-    if (!msg || !msg.timestamp) return;
     const isMine = msg.senderEmail === currentUser.email;
-
-    const dateId = `date-${(msg.date || "").replace(/\//g, "-")}`;
+    const dateId = `date-${msg.date.replace(/\//g, "-")}`;
     if (!document.getElementById(dateId)) {
-      const divider = document.createElement("div");
-      divider.id = dateId;
-      divider.className = "date-divider";
-      divider.textContent = `--- ${msg.date || ""} ---`;
-      chatContainer.appendChild(divider);
+      const div = document.createElement("div");
+      div.id = dateId;
+      div.className = "date-divider";
+      div.textContent = `--- ${msg.date} ---`;
+      chatContainer.appendChild(div);
     }
 
     const wrapper = document.createElement("div");
@@ -94,40 +95,20 @@ window.onload = () => {
 
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble ${isMine ? "right" : "left"}`;
-    const textDiv = document.createElement("div");
-    textDiv.className = "bubble-text";
-
-    let safe = escapeHtml(msg.text || "");
-    safe = safe
-      .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>");
-    textDiv.innerHTML = safe;
-    bubble.appendChild(textDiv);
+    bubble.textContent = msg.text;
     wrapper.appendChild(bubble);
 
-    const timeEl = document.createElement("div");
-    timeEl.className = `msg-time ${isMine ? "mine-time" : "theirs-time"}`;
-    timeEl.textContent = msg.timestamp || "";
-    wrapper.appendChild(timeEl);
+    const time = document.createElement("div");
+    time.className = `msg-time ${isMine ? "mine-time" : "theirs-time"}`;
+    time.textContent = msg.timestamp || "";
+    wrapper.appendChild(time);
 
     chatContainer.appendChild(wrapper);
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  function escapeHtml(s) {
-    if (!s) return "";
-    return s.replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    }[c]));
-  }
-
-  let initialized = false;
+  // ✅ 初期ロード
   function initChat() {
-    if (initialized) return;
-    initialized = true;
-
     const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
     get(messagesRef).then(snapshot => {
       if (snapshot.exists()) {
@@ -137,17 +118,18 @@ window.onload = () => {
     });
 
     onChildAdded(ref(db, "chat_messages"), snap => {
-      const d = snap.val();
-      addMessageToDOM(d);
+      addMessageToDOM(snap.val());
     });
   }
 
-  sendBtn.onclick = () => sendMessage(chatInput.value);
+  // ✅ 送信ボタン
+  sendBtn.addEventListener("click", () => sendMessage(chatInput.value));
 
-  chatInput.onkeydown = e => {
+  // ✅ Ctrl+Enter or Cmd+Enter で送信
+  chatInput.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       sendMessage(chatInput.value);
     }
-  };
-};
+  });
+});
