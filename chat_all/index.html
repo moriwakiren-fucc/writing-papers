@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>チャット | 論文制作ページ</title>
 
-  <!-- style + main を確実に読み込む（キャッシュ対策乱数付き） -->
+  <!-- CSS + JSを乱数付きで確実に再読み込み -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      const v = Math.floor(Math.random() * 1000000) + 1;
+      const v = Math.floor(Math.random() * 1000000);
       const css = document.createElement("link");
       css.rel = "stylesheet";
       css.href = `style.css?v=${v}`;
@@ -18,38 +18,29 @@
       js.type = "module";
       js.src = `main.js?v=${v}`;
       document.body.appendChild(js);
-      console.log("loaded version:", v);
     });
   </script>
-
 </head>
+
 <body>
-  <!-- 上部固定ヘッダー -->
+  <!-- ヘッダー -->
   <header>
     <h2><a href="../">《</a></h2>
     <h1>チャット</h1>
   </header>
 
-  <!-- メッセージ一覧 -->
-  <main id="chat-container" aria-live="polite"></main>
+  <!-- チャット表示 -->
+  <main id="chat-container"></main>
 
-  <!-- 送信帯 -->
-  <div class="chat-input-area" role="region" aria-label="メッセージ入力">
-    <button id="file-btn" title="ファイル送信" aria-label="ファイル送信">
-      <img src="../imgs/chat/send_file.png" alt="ファイル送信">
-    </button>
-
-    <textarea id="chat-input" placeholder="メッセージを入力（Enterで改行、Ctrl/Cmd+Enterで送信）" rows="2" aria-label="メッセージ入力"></textarea>
-
+  <!-- 入力エリア -->
+  <div class="chat-input-area">
+    <textarea
+      id="chat-input"
+      placeholder="メッセージを入力（Ctrl+Enterで送信、Enterで改行）"
+      rows="2"></textarea>
     <button id="send-btn" title="送信" aria-label="送信">
       <img src="../imgs/chat/send.png" alt="送信">
     </button>
-  </div>
-
-  <!-- 動画再生用フルスクリーンモーダル -->
-  <div id="video-modal" class="video-modal" aria-hidden="true">
-    <video id="video-player" controls></video>
-    <button id="video-close" class="video-close" aria-label="閉じる">✕</button>
   </div>
 </body>
 </html>
