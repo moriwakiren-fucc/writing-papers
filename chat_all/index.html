@@ -8,8 +8,12 @@
   <!-- CSS を乱数付きで読み込み（キャッシュ回避） -->
   <link id="chat-style" rel="stylesheet" href="">
   <script>
-    const vStyle = Math.floor(Math.random() * 1000000);
-    document.getElementById("chat-style").href = `style.css?v=${vStyle}`;
+    // CSS のキャッシュ回避（読み込みを早めに設定）
+    (function(){
+      const vStyle = Math.floor(Math.random() * 1000000);
+      const link = document.getElementById("chat-style");
+      if (link) link.href = "style.css?v=" + vStyle;
+    })();
   </script>
 </head>
 
@@ -35,9 +39,17 @@
     </button>
   </div>
 
-  <!-- main.js を確実に DOM 構築後に読み込む（乱数付き） -->
-  <!--   <script type="module" src="main.js?v=<?php echo rand(0,999999); ?>"></script> -->
-  <!-- 上で PHP が使えない環境なら、下のように固定または手動更新する -->
-<script type="module" src="main.js?v=121236"></script>
+  <!-- main.js を DOM 構築後にモジュールとして読み込む（乱数付き） -->
+  <script>
+    (function(){
+      // 0 以上 999999 未満の乱数を生成して main.js に付与
+      const v = Math.floor(Math.random() * 1000000);
+      const script = document.createElement("script");
+      script.type = "module";
+      script.src = "main.js?v=" + v;
+      // モジュールは defer 相当なので body 末尾で追加すれば DOM 要素にアクセス可能
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
