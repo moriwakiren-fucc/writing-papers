@@ -31,56 +31,69 @@ header h1 { margin:0; font-size:1.4rem; font-weight:700; text-align:center; flex
   margin: 10px 0;
   font-size: 0.8em;
 }
-
 .message-wrapper {
+  margin: 0.5em 0;
   display: flex;
   flex-direction: column;
-  margin: 8px 10px;
-  max-width: 80%;
+  font-family: "Noto Sans JP", sans-serif;
 }
 
-/* 自分のメッセージ（右寄せ） */
 .message-wrapper.mine {
-  align-self: flex-end;
-  text-align: right;
-}
-.chat-bubble.right {
-  background-color: #0084ff;
-  color: #fff;
-  border-radius: 12px 12px 0 12px;
-  padding: 8px 12px;
-  display: inline-block;
-}
-.mine-time {
-  font-size: 0.5em;
-  color: #666;
-  margin-top: 2px;
-  align-self: flex-start;
+  align-items: flex-end;
 }
 
-/* 他人のメッセージ（左寄せ） */
 .message-wrapper.theirs {
-  align-self: flex-start;
-  text-align: left;
+  align-items: flex-start;
 }
+
 .sender {
   font-size: 0.5em;
-  color: #555;
-  margin-bottom: 2px;
-  margin-left: 5px;
-}
-.chat-bubble.left {
-  background-color: #e5e5ea;
-  color: #000;
-  border-radius: 12px 12px 12px 0;
-  padding: 8px 12px;
-  display: inline-block;
-}
-.theirs-time {
-  font-size: 0.5em;
   color: #666;
-  margin-top: 2px;
+  margin-bottom: 0.2em;
+  margin-left: 0.5em;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 0.5em 0.8em;
+  border-radius: 1em;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat-bubble.right {
+  background: #cce5ff;
   align-self: flex-end;
+  border-bottom-right-radius: 0.2em;
+}
+
+.chat-bubble.left {
+  background: #f1f1f1;
+  align-self: flex-start;
+  border-bottom-left-radius: 0.2em;
+}
+
+.msg-time {
+  font-size: 0.5em;
+  color: #888;
+  margin-top: 0.2em;
+}
+
+.mine-time {
+  align-self: flex-start; /* 吹き出し左下 */
+  margin-left: 0.5em;
+}
+
+.theirs-time {
+  align-self: flex-end; /* 吹き出し右下 */
+  margin-right: 0.5em;
+}
+
+.date-divider {
+  text-align: center;
+  color: #999;
+  font-size: 0.8em;
+  margin: 1em 0;
 }
 
 /* その他調整 */
