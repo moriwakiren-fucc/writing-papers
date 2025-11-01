@@ -1,6 +1,6 @@
-// main.js — Firebase v11対応・送信バグ修正版
+// main.js — Firebase v11対応・完全安定版（送信バグ修正済）
 
-import { db, auth } from "../login/firebase-config.js";
+import { db, auth } from "../login/firebase-config.js?v=" + Math.floor(Math.random() * 1000000);
 import {
   ref,
   push,
@@ -28,7 +28,8 @@ function statusBox(text) {
       borderRadius: "6px",
       zIndex: "9999",
       maxWidth: "300px",
-      lineHeight: "1.4"
+      lineHeight: "1.4",
+      whiteSpace: "pre-wrap"
     });
     document.body.appendChild(box);
   }
@@ -50,7 +51,7 @@ function escapeHtml(s) {
   }[c]));
 }
 
-/* ---------- 表示 ---------- */
+/* ---------- メッセージ追加 ---------- */
 function addMessageToDOM(msg, currentUserEmail) {
   const isMine = (msg.senderEmail === currentUserEmail);
   const dateKey = msg.date.replace(/\//g, "-");
@@ -92,19 +93,19 @@ function addMessageToDOM(msg, currentUserEmail) {
 let currentUser = null;
 let initialized = false;
 
-/* ---------- 初期ロード ---------- */
+/* ---------- チャット初期化 ---------- */
 function initChat() {
   if (initialized) return;
   initialized = true;
 
   const messagesRef = query(ref(db, "chat_messages"), orderByChild("timeValue"));
 
-  // 履歴取得 (v11対応)
   get(messagesRef)
     .then(snapshot => {
-      if (snapshot?.exists) {
+      if (snapshot.exists()) {
         const data = snapshot.val();
-        Object.values(data).forEach(d => addMessageToDOM(d, currentUser.email));
+        const sorted = Object.values(data).sort((a, b) => a.timeValue - b.timeValue);
+        sorted.forEach(d => addMessageToDOM(d, currentUser.email));
         statusBox(["履歴取得完了", `user: ${currentUser.email}`]);
       } else {
         statusBox(["履歴なし", `user: ${currentUser.email}`]);
@@ -115,7 +116,8 @@ function initChat() {
     });
 
   // リアルタイム監視
-  onChildAdded(ref(db, "chat_messages"), snap => {
+  const liveRef = ref(db, "chat_messages");
+  onChildAdded(liveRef, snap => {
     const d = snap.val();
     addMessageToDOM(d, currentUser.email);
   });
@@ -134,21 +136,24 @@ function sendMessage(text) {
   const hh = now.getHours().toString().padStart(2, "0");
   const mm = now.getMinutes().toString().padStart(2, "0");
 
-  push(ref(db, "chat_messages"), {
+  const msg = {
     senderEmail: currentUser.email,
     senderName: currentUser.name,
     text: trimmed,
     timestamp: `${hh}:${mm}`,
     date: now.toLocaleDateString("ja-JP"),
     timeValue: now.getTime()
-  })
-  .then(() => {
-    chatInput.value = "";
-    statusBox(["送信成功", `user: ${currentUser.email}`]);
-  })
-  .catch(err => {
-    statusBox(["送信失敗", err.message || err]);
-  });
+  };
+
+  const msgRef = ref(db, "chat_messages");
+  push(msgRef, msg)
+    .then(() => {
+      chatInput.value = "";
+      statusBox(["送信成功", trimmed]);
+    })
+    .catch(err => {
+      statusBox(["送信失敗", err.message || err]);
+    });
 }
 
 /* ---------- 認証 ---------- */
@@ -157,9 +162,13 @@ onAuthStateChanged(auth, user => {
     window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
     return;
   }
-  currentUser = { email: user.email, uid: user.uid, name: user.displayName || user.email };
-  initChat();
+  currentUser = {
+    email: user.email,
+    uid: user.uid,
+    name: user.displayName || user.email
+  };
   statusBox(["認証OK", `user: ${user.email}`]);
+  initChat();
 });
 
 /* ---------- イベント ---------- */
