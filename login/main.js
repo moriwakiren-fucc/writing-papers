@@ -36,7 +36,7 @@ loginBtn.addEventListener("click", async () => {
     window.location.href = "../index.html";
   } catch (error) {
     console.error(error);
-    errorMessage.textContent = "ログインに失敗しました。メールアドレスまたはパスワードを確認してください。";
+    errorMessage.textContent = "ログインに失敗しました。ＩＤまたはパスワードを確認してください。";
   }
 });
 
