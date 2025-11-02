@@ -175,11 +175,11 @@ main h1 {
 
 .urla {
   display:block;
-  height: 20vh;
+  height: 5em;
   width: 100%;
   font-family: Noto Sans JP;
   padding: 0;
-  margin: 0;
+  margin: 1.3em 0;
   text-decoration: none;
   color: #FFFFFF;
   font-size: 2em;
