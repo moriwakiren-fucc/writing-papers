@@ -167,15 +167,16 @@ main h1 {
 
 .urldiv {
   height: 100%;
-  width: 95%;
+  width: 100%%;
   border-radius: 5px;
   text-align: center;
   margin: auto;
 }
 
 .urla {
+  vertical-align: middle;
   display:block;
-  height: 5em;
+  height: 4em;
   width: 100%;
   font-family: Noto Sans JP;
   padding: 0;
