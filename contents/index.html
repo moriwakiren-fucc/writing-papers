@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>コンテンツ</title>
-  <link rel="stylesheet" href="style.css?v=9">
-  <script type="module" src="main.js?v=9"></script>
+  <title>コンテンツ</title>  <!-- CSSを乱数付きで読み込み -->
+  <link id="chat-style" rel="stylesheet" href="">
+  <script>
+    const vStyle = Math.floor(Math.random() * 1000000);
+    document.getElementById("chat-style").href = `style.css?v=${vStyle}`;
+  </script>
 </head>
 <body>
   <!-- お知らせバナー -->
@@ -63,6 +66,10 @@
     </section>
 
   </main>
-
+  <!-- main.jsをランダムパラメータ付きで読み込み -->
+<script type="module">
+  const rand = Math.floor(Math.random() * 1000000);
+  import(`./main.js?v=${rand}`);
+</script>
 </body>
 </html>
