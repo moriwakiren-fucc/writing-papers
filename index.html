@@ -1,29 +1,52 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>論文制作ページ</title>
 
-  <!-- 🔒 初期状態で完全非表示（JSが走る前に描画させない） -->
+  <!-- ---------------------------
+       重要：最初から完全非表示（チラ見をゼロにする）
+       --------------------------- -->
   <style>
     html, body {
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      background-color: #fff;
+      visibility: hidden !important;
+      height: 100%;
+      margin: 0;
+      background: #fff;
+    }
+    /* 状態ボックスは非表示でも body が hidden の間に作れるようにする */
+    #auth-status {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      z-index: 99999;
+      font-size: 12px;
+      display: none;
+      max-width: 320px;
+      word-break: break-word;
     }
   </style>
 
-  <!-- CSSを乱数付きで読み込み -->
+  <!-- CSS を乱数付きで読み込む（キャッシュ回避） -->
   <link id="chat-style" rel="stylesheet" href="">
   <script>
     const vStyle = Math.floor(Math.random() * 1000000);
     document.getElementById("chat-style").href = `style.css?v=${vStyle}`;
   </script>
-</head>
 
+  <!-- Firebase compat を直接読み込む（モジュール import トラブル回避） -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
 <body>
+  <div id="auth-status">初期化中…</div>
+
   <!-- お知らせバナー -->
   <div class="banner">頑張ろう！！</div>
 
@@ -70,13 +93,13 @@
     </section>
   </main>
 
-  <!-- JS（乱数付き） -->
-  <script type="module">
-    const vMain = Math.floor(Math.random() * 1000000);
-    const script = document.createElement("script");
-    script.type = "module";
-    script.src = `./main.js?v=${vMain}`;
-    document.body.appendChild(script);
+  <!-- main.js を乱数付きで読み込む（キャッシュ回避） -->
+  <script>
+    const v = Math.floor(Math.random() * 1000000);
+    const s = document.createElement("script");
+    s.src = `./main.js?v=${v}`;
+    s.defer = true; // DOMが生成されてから実行（ただし body は hidden のまま）
+    document.body.appendChild(s);
   </script>
 </body>
 </html>
