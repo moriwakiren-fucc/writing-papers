@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>論文制作ページ</title>
+
+  <!-- 🔒 初期状態で完全非表示（JSが走る前に描画させない） -->
+  <style>
+    html, body {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      background-color: #fff;
+    }
+  </style>
+
   <!-- CSSを乱数付きで読み込み -->
   <link id="chat-style" rel="stylesheet" href="">
   <script>
@@ -11,6 +22,7 @@
     document.getElementById("chat-style").href = `style.css?v=${vStyle}`;
   </script>
 </head>
+
 <body>
   <!-- お知らせバナー -->
   <div class="banner">頑張ろう！！</div>
@@ -56,10 +68,15 @@
         <hr>
       </div>
     </section>
-
   </main>
 
-  <script type="module" src="./main.js?v=9123"></script>
-
+  <!-- JS（乱数付き） -->
+  <script type="module">
+    const vMain = Math.floor(Math.random() * 1000000);
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src = `./main.js?v=${vMain}`;
+    document.body.appendChild(script);
+  </script>
 </body>
 </html>
