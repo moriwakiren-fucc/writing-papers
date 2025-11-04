@@ -1,44 +1,49 @@
-// main.js — 未ログインなら ../login/ にリダイレクト
+// main.js — ログインしていなければ即リダイレクト（チラ見完全防止）
 
-// Firebaseモジュールの読み込み
+// ------------------------------
+// Firebase 読み込み
+// ------------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { firebaseConfig } from "../login/firebase-config.js";  // ← ../login/ から設定を読み込む
+import { firebaseConfig } from "../login/firebase-config.js";
 
+// ------------------------------
 // Firebase 初期化
+// ------------------------------
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* -------------------------
-   ログイン状態の監視
--------------------------- */
+// ------------------------------
+// ページ初期状態は非表示（チラ見防止）
+// ------------------------------
+document.documentElement.style.visibility = "hidden";
+document.body.style.display = "none";
+
+// ------------------------------
+// 認証チェック
+// ------------------------------
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    // 未ログイン → ../login/ に強制移動
-    window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
+    // ❌ 未ログイン → ログインページへ強制移動
+    window.location.replace("../login/index.html?v=" + Math.floor(Math.random() * 1000000));
   } else {
-    console.log("ログイン中:", user.email);
+    // ✅ ログイン済み → ページを表示
+    document.documentElement.style.visibility = "visible";
+    document.body.style.display = "block";
     initPage(user);
   }
 });
 
-/* -------------------------
-   ページ機能（ログイン済みのみ有効）
--------------------------- */
+// ------------------------------
+// ログイン済みのみ動く処理
+// ------------------------------
 function initPage(user) {
-  // ページを表示（非表示設定している場合のために）
-  document.body.style.display = "block";
-
   // サイドメニュー開閉
   const menuBtn = document.getElementById("menu-btn");
   const sideMenu = document.getElementById("side-menu");
   if (menuBtn && sideMenu) {
     menuBtn.addEventListener("click", () => {
-      if (sideMenu.style.left === "0px") {
-        sideMenu.style.left = "-250px";
-      } else {
-        sideMenu.style.left = "0px";
-      }
+      sideMenu.style.left = sideMenu.style.left === "0px" ? "-250px" : "0px";
     });
   }
 
@@ -47,34 +52,23 @@ function initPage(user) {
     btn.addEventListener("click", () => {
       const content = btn.nextElementSibling;
       if (!content) return;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-        btn.textContent = btn.textContent.replace("▲", "▼");
-      } else {
-        content.style.display = "block";
-        btn.textContent = btn.textContent.replace("▼", "▲");
-      }
+      const isOpen = content.style.display === "block";
+      content.style.display = isOpen ? "none" : "block";
+      btn.textContent = btn.textContent.replace(isOpen ? "▲" : "▼", isOpen ? "▼" : "▲");
     });
   });
 
-  // 未読件数（仮の値）
+  // 未読件数（仮）
   const unreadCountEl = document.getElementById("unread-count");
   if (unreadCountEl) unreadCountEl.textContent = "0";
 
-  // ログアウト機能
+  // ログアウトボタン
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       signOut(auth)
-        .then(() => {
-          window.location.href = "../login/index.html?v=" + Math.floor(Math.random() * 1000000);
-        })
+        .then(() => window.location.replace("../login/index.html?v=" + Math.floor(Math.random() * 1000000)))
         .catch(err => alert("ログアウトエラー: " + err.message));
     });
   }
 }
-
-/* -------------------------
-   読み込み中はbody非表示にしておく（未ログインでもチラ見防止）
--------------------------- */
-document.body.style.display = "none";
